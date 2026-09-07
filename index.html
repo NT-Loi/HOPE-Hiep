@@ -1,0 +1,2050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Natural Heart Nodes</title>
+    <style>
+        :root {
+            /* Default: Rose Studio on pristine white/light background */
+            --bg-0: #f4f5f8;
+            --bg-1: #ffffff;
+            --primary: #e11d48;
+            --primary-soft: #f43f5e;
+            --primary-glow: rgba(225, 29, 72, 0.25);
+            --panel: rgba(255, 255, 255, 0.88);
+            --panel-border: rgba(0, 0, 0, 0.08);
+            --text: #0f172a;
+            --muted: #64748b;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 50% 40%, var(--bg-1) 0%, var(--bg-0) 85%),
+                #ffffff;
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: background 0.6s ease;
+        }
+
+        #scene-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            display: block;
+            cursor: grab;
+        }
+        #scene-canvas.grabbing { cursor: grabbing; }
+        #scene-canvas.pointer  { cursor: pointer; }
+
+        #ui {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 22px 28px;
+            z-index: 30;
+        }
+
+        .ui-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .title-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .title {
+            font-size: 18px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--primary);
+            text-shadow: 0 1px 8px var(--primary-glow);
+            font-weight: 700;
+            transition: color 0.4s ease, text-shadow 0.4s ease;
+        }
+
+        .subtitle {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .hint {
+            color: var(--muted);
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .progress {
+            width: 220px;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress > span {
+            display: block;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-soft), var(--primary));
+            box-shadow: 0 0 8px var(--primary-glow);
+            transition: width 0.08s linear;
+        }
+
+        .ui-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: auto;
+        }
+
+        /* Segmented Level Switcher */
+        .level-nav {
+            display: flex;
+            align-items: center;
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 999px;
+            padding: 3px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .level-btn {
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-weight: 600;
+        }
+        .level-btn:hover {
+            color: var(--text);
+        }
+        .level-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            font-weight: 700;
+            box-shadow: 0 2px 10px var(--primary-glow);
+        }
+
+        .theme-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 15px;
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 999px;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text);
+            cursor: pointer;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+            font-weight: 600;
+        }
+        .theme-btn:hover {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 16px var(--primary-glow);
+            transform: translateY(-1px);
+        }
+
+        /* ===== Level 4: Letters View Overlay ===== */
+        #letters-container {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 90px 40px;
+            pointer-events: none;
+            opacity: 0;
+            transform: scale(0.96);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            z-index: 20;
+        }
+        #letters-container.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .letters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 280px));
+            gap: 24px;
+            max-width: 1200px;
+            width: 100%;
+            max-height: 75vh;
+            overflow-y: auto;
+            padding: 12px;
+        }
+        .letters-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+        .letters-grid::-webkit-scrollbar-thumb {
+            background: var(--panel-border);
+            border-radius: 3px;
+        }
+
+        .letter-card {
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 24px 20px;
+            cursor: pointer;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        .letter-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0.8;
+        }
+        .letter-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.10), 0 0 20px var(--primary-glow);
+        }
+
+        .letter-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .letter-seal {
+            font-size: 24px;
+            filter: drop-shadow(0 2px 6px var(--primary-glow));
+        }
+        .letter-date {
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        .letter-title {
+            font-size: 16px;
+            color: var(--text);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .letter-excerpt {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .letter-action {
+            margin-top: auto;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: var(--primary);
+            text-transform: uppercase;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Letter Reader Modal */
+        #letter-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.48);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 120;
+            padding: 24px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #letter-modal.open {
+            display: flex;
+            opacity: 1;
+        }
+
+        .letter-paper {
+            max-width: 620px;
+            width: 100%;
+            max-height: 82vh;
+            background: #ffffff;
+            border: 1px solid var(--panel-border);
+            border-radius: 20px;
+            padding: 40px 36px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.20);
+            position: relative;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .letter-paper::-webkit-scrollbar { width: 6px; }
+        .letter-paper::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.12); border-radius: 3px; }
+
+        .letter-paper-close {
+            position: absolute;
+            top: 20px; right: 20px;
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: var(--primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s ease;
+        }
+        .letter-paper-close:hover {
+            background: var(--primary);
+            color: #ffffff;
+            transform: scale(1.08);
+        }
+
+        .letter-paper-title {
+            font-size: 22px;
+            color: var(--primary);
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        .letter-paper-date {
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--muted);
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        .letter-paper-body {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #1e293b;
+            white-space: pre-wrap;
+            font-family: Georgia, 'Times New Roman', serif;
+        }
+
+        /* ===== Lightbox ===== */
+        #lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        #lightbox.open { display: flex; opacity: 1; }
+
+        #lightbox-canvas {
+            max-width: 92vw;
+            max-height: 82vh;
+            cursor: grab;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+            border-radius: 8px;
+            background: #ffffff;
+        }
+        #lightbox-canvas.dragging { cursor: grabbing; }
+
+        .lb-btn {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.90);
+            border: 1px solid rgba(0, 0, 0, 0.10);
+            color: var(--primary);
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            font-size: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            pointer-events: auto;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+        .lb-btn:hover {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 20px var(--primary-glow);
+            transform: scale(1.08);
+        }
+        .lb-close { top: 24px; right: 24px; }
+        .lb-prev  { left: 24px;  top: 50%; transform: translateY(-50%); }
+        .lb-next  { right: 24px; top: 50%; transform: translateY(-50%); }
+        .lb-prev:hover, .lb-next:hover { transform: translateY(-50%) scale(1.08); }
+
+        .lb-caption {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #f8fafc;
+            font-size: 13px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            pointer-events: none;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            font-weight: 500;
+        }
+
+        .lb-hint {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #f8fafc;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            pointer-events: none;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="scene-canvas"></canvas>
+
+    <div id="ui">
+        <div class="ui-row">
+            <div class="title-block">
+                <div class="title" id="page-title">Natural Heart Nodes</div>
+                <div class="subtitle" id="level-subtitle">Level 1 · Natural Heart</div>
+            </div>
+            <div class="ui-controls">
+                <div class="level-nav">
+                    <button class="level-btn active" data-level="0">1 · Heart</button>
+                    <button class="level-btn" data-level="1">2 · Memories</button>
+                    <button class="level-btn" data-level="2">3 · Gallery</button>
+                    <button class="level-btn" data-level="3">4 · Letters</button>
+                </div>
+                <button class="theme-btn" id="theme-btn" aria-label="Toggle Theme">
+                    <span id="theme-icon">💖</span> <span id="theme-text">Rose Studio</span>
+                </button>
+            </div>
+        </div>
+        <div class="ui-row">
+            <div class="hint" id="level-hint">Drag · Rotate &nbsp;·&nbsp; Scroll · Zoom In to Memories</div>
+            <div class="progress"><span id="progress-bar"></span></div>
+        </div>
+    </div>
+
+    <!-- Level 4: Letters Container -->
+    <div id="letters-container">
+        <div class="letters-grid" id="letters-grid"></div>
+    </div>
+
+    <!-- Letter Reading Modal -->
+    <div id="letter-modal">
+        <div class="letter-paper">
+            <button class="letter-paper-close" id="letter-close" aria-label="Close Letter">✕</button>
+            <div class="letter-paper-date" id="letter-modal-date">Date</div>
+            <div class="letter-paper-title" id="letter-modal-title">Letter Title</div>
+            <div class="letter-paper-body" id="letter-modal-body">Letter body goes here...</div>
+        </div>
+    </div>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" aria-hidden="true">
+        <div class="lb-hint">Wheel: zoom · Drag: pan · Esc / ✕: close</div>
+        <button class="lb-btn lb-close" id="lb-close" aria-label="Close">✕</button>
+        <button class="lb-btn lb-prev"  id="lb-prev"  aria-label="Previous">‹</button>
+        <button class="lb-btn lb-next"  id="lb-next"  aria-label="Next">›</button>
+        <canvas id="lightbox-canvas"></canvas>
+        <div class="lb-caption" id="lb-caption">1 / 4</div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+        // ============================================================
+        // USER LETTERS CONTENT (You can easily edit / add letters here!)
+        // ============================================================
+        const LETTERS = [
+            {
+                id: 1,
+                title: "The First Moment",
+                date: "September 07, 2024",
+                excerpt: "Every story has a beginning, but meeting you felt like finding a piece of myself I never knew was missing...",
+                content: `My Love,
+
+Every story has a beginning, but meeting you felt like finding a piece of myself I never knew was missing. The world seemed to slow down, and in that quiet instant, everything made sense.
+
+Thank you for bringing your warmth, your radiant smile, and your gentle heart into my life. Every day with you is a gift I cherish deeply.
+
+(You can fill in and customize your own heartfelt message here anytime in index.html inside the LETTERS array!)`
+            },
+            {
+                id: 2,
+                title: "A Gentle Promise",
+                date: "October 15, 2024",
+                excerpt: "Through every season, through every quiet morning and starry night, I promise to walk beside you...",
+                content: `To My Dearest,
+
+Through every season, through every quiet morning and starry night, I promise to walk beside you, to listen to your dreams, to hold your hand through the storms, and to celebrate every joy.
+
+No matter where life takes us or how fast the world turns, my heart will always find its quiet home with you.
+
+(You can fill in and customize your own heartfelt message here anytime in index.html inside the LETTERS array!)`
+            },
+            {
+                id: 3,
+                title: "Sweetest Memories",
+                date: "December 24, 2024",
+                excerpt: "I still smile remembering all our little moments—the shared laughs, the late talks, and the unspoken words...",
+                content: `My Sweetheart,
+
+I still smile remembering all our little moments—the spontaneous laughs over silly jokes, the quiet walks under city lights, and the comfort of just holding hands in silence.
+
+Those simple memories are my greatest treasures, and I can't wait to make a million more beautiful memories with you.
+
+(You can fill in and customize your own heartfelt message here anytime in index.html inside the LETTERS array!)`
+            },
+            {
+                id: 4,
+                title: "Forever & Always",
+                date: "Present & Future",
+                excerpt: "No matter how far we travel, this heart belongs to you and you alone. Mãi yêu em...",
+                content: `Forever Yours,
+
+No matter how far we travel, how many days pass, or what the future brings, know that you are loved unconditionally and completely.
+
+Thank you for being my light, my happiness, and my everything. Mãi yêu em!
+
+(You can fill in and customize your own heartfelt message here anytime in index.html inside the LETTERS array!)`
+            }
+        ];
+
+        // ============================================================
+        // PALETTES CONFIGURATION (Rose Glow matching reference, Emerald option)
+        // ============================================================
+        const THEMES = {
+            rose: {
+                id: 'rose',
+                name: 'Rose Studio',
+                icon: '💖',
+                title: 'Natural Heart Nodes',
+                bg0: '#f4f5f8',
+                bg1: '#ffffff',
+                primary: '#e11d48',
+                primarySoft: '#f43f5e',
+                primaryGlow: 'rgba(225, 29, 72, 0.25)',
+                panel: 'rgba(255, 255, 255, 0.88)',
+                panelBorder: 'rgba(0, 0, 0, 0.08)',
+                text: '#0f172a',
+                muted: '#64748b',
+                nodeHues: [0.96, 0.98, 0.94, 0.01],
+                coreColor: '#be123c',
+                haloHex: 0xe11d48,
+                dustHex: 0xf43f5e,
+            },
+            emerald: {
+                id: 'emerald',
+                name: 'Emerald Studio',
+                icon: '🌿',
+                title: 'Green Heart Nodes',
+                bg0: '#f2f8f3',
+                bg1: '#ffffff',
+                primary: '#4CAF50',
+                primarySoft: '#81C784',
+                primaryGlow: 'rgba(76, 175, 80, 0.28)',
+                panel: 'rgba(255, 255, 255, 0.88)',
+                panelBorder: 'rgba(0, 0, 0, 0.08)',
+                text: '#0f172a',
+                muted: '#64748b',
+                nodeHues: [0.335, 0.355, 0.32, 0.37],
+                coreColor: '#4CAF50',
+                haloHex: 0x4CAF50,
+                dustHex: 0x81C784,
+            }
+        };
+
+        let currentTheme = THEMES.emerald;
+
+        // ============================================================
+        // CONFIG
+        // ============================================================
+        const PHOTO_FILES = ['./img/a1.jpg', './img/a2.jpg', './img/a3.jpg', './img/a4.jpg'];
+        const NODE_COUNT  = 5000;         // interactive heart nodes
+        const HALO_COUNT  = 1800;         // glowing aura particles
+        const DUST_COUNT  = 180;          // gentle falling sparkles
+        const HEART_SCALE = 12.0;          // prominent heart size
+        const HEART_DEPTH = 2.8;          // 3D volumetric thickness
+        const SCATTER_RADIUS = 40;        // flight distance when scattered
+        const SMOOTH = 4.2;               // lerp speed
+        const NODE_BASE_SIZE = 0.44;      // base node size
+
+        // Geometric center of heart curve
+        const CX = 0.0;
+        const CY = -2.5;
+
+        // ============================================================
+        // THREE.JS SETUP
+        // ============================================================
+        const canvas = document.getElementById('scene-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0xffffff, 0);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+            52, window.innerWidth / window.innerHeight, 0.1, 250
+        );
+        camera.position.set(0, 0, 32);
+
+        // ============================================================
+        // PROCEDURAL PARTICLE TEXTURES (Clean Luminance Alpha Masks)
+        // ============================================================
+        function createGlowTexture() {
+            const size = 128;
+            const c = document.createElement('canvas');
+            c.width = c.height = size;
+            const ctx = c.getContext('2d');
+            const g = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+            g.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+            g.addColorStop(0.30, 'rgba(255, 255, 255, 0.95)');
+            g.addColorStop(0.60, 'rgba(255, 255, 255, 0.55)');
+            g.addColorStop(0.85, 'rgba(255, 255, 255, 0.18)');
+            g.addColorStop(1.0, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, size, size);
+            const tex = new THREE.CanvasTexture(c);
+            tex.colorSpace = THREE.SRGBColorSpace;
+            return tex;
+        }
+
+        function createHaloTexture() {
+            const size = 64;
+            const c = document.createElement('canvas');
+            c.width = c.height = size;
+            const ctx = c.getContext('2d');
+            const g = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+            g.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+            g.addColorStop(0.35, 'rgba(255, 255, 255, 0.75)');
+            g.addColorStop(0.70, 'rgba(255, 255, 255, 0.25)');
+            g.addColorStop(1.0, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, size, size);
+            const tex = new THREE.CanvasTexture(c);
+            tex.colorSpace = THREE.SRGBColorSpace;
+            return tex;
+        }
+
+        let nodeTexture = createGlowTexture();
+        let haloTexture = createHaloTexture();
+
+        // ============================================================
+        // NATURAL HEART MATHEMATICS & ARC-LENGTH WEIGHTED SAMPLING
+        // ============================================================
+        const MAX_CURVE_SPEED = 24.5;
+        function sampleContourUniform() {
+            while (true) {
+                const t = Math.random() * Math.PI * 2;
+                const sinT = Math.sin(t);
+                const cosT = Math.cos(t);
+                const dxdt = 48 * sinT * sinT * cosT;
+                const dydt = -13 * sinT + 10 * Math.sin(2 * t) + 6 * Math.sin(3 * t) + 4 * Math.sin(4 * t);
+                const speed = Math.hypot(dxdt, dydt);
+                if (Math.random() < speed / MAX_CURVE_SPEED) {
+                    const bx = 16 * Math.pow(sinT, 3);
+                    const by = 13 * cosT - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+                    return { bx, by, t };
+                }
+            }
+        }
+
+        // Generate natural points with 4 organic layers
+        function sampleNaturalHeartNode(i) {
+            const { bx, by } = sampleContourUniform();
+            const u = Math.random();
+
+            let x, y, layer;
+
+            if (u < 0.10) {
+                layer = 'contour';
+                x = bx + (Math.random() - 0.5) * 0.9;
+                y = by + (Math.random() - 0.5) * 0.9;
+            } else if (u < 0.30) {
+                layer = 'edge';
+                const rx = -0.07 * Math.log(Math.max(1e-7, Math.random()));
+                const ry = -0.07 * Math.log(Math.max(1e-7, Math.random()));
+                x = bx - rx * (bx - CX) + (Math.random() - 0.5) * 0.8;
+                y = by - ry * (by - CY) + (Math.random() - 0.5) * 0.8;
+            } else if (u < 0.90) {
+                layer = 'mid';
+                const rx = -0.22 * Math.log(Math.max(1e-7, Math.random()));
+                const ry = -0.22 * Math.log(Math.max(1e-7, Math.random()));
+                x = bx - rx * (bx - CX) + (Math.random() - 0.5) * 1.1;
+                y = by - ry * (by - CY) + (Math.random() - 0.5) * 1.1;
+            } else {
+                layer = 'inner';
+                const r = 0.10 + 0.50 * Math.pow(Math.random(), 1.5);
+                x = CX + (bx - CX) * r + (Math.random() - 0.5) * 1.0;
+                y = CY + (by - CY) * r + (Math.random() - 0.5) * 1.0;
+            }
+
+            const distFromCenter = Math.hypot(x - CX, y - CY);
+            const maxR = 16;
+            const profile = Math.max(0.18, Math.cos(Math.min(Math.PI * 0.48, (distFromCenter / maxR) * (Math.PI * 0.48))));
+            const z = (Math.random() - 0.5) * HEART_DEPTH * profile * 1.8;
+
+            const scaleFac = HEART_SCALE / 17;
+            const posHeart = new THREE.Vector3(
+                x * scaleFac,
+                (y - CY) * scaleFac,
+                z
+            );
+
+            // Level 2 scattered position:
+            // Light nodes disperse outward widely into a spacious, airy 3D volumetric constellation
+            // Avoid center clumping by expanding inner nodes outward
+            const scatterRadFactor = 2.8 + Math.random() * 2.8;
+            const jitterAngle = (Math.random() - 0.5) * 1.2;
+            const origAngle = Math.atan2((y - CY) * scaleFac, x * scaleFac) + jitterAngle;
+            const origDist = Math.hypot(x * scaleFac, (y - CY) * scaleFac);
+            const expandedDist = Math.max(8.0, origDist * scatterRadFactor) + (Math.random() - 0.5) * 9.0;
+
+            const posScatterLevel2 = new THREE.Vector3(
+                Math.cos(origAngle) * expandedDist + (Math.random() - 0.5) * 6.0,
+                Math.sin(origAngle) * expandedDist + (Math.random() - 0.5) * 6.0,
+                (Math.random() - 0.5) * 30.0
+            );
+
+            // Level 3 space-filling light nodes (fills the space like Level 4 background)
+            const starR3 = SCATTER_RADIUS * 1.15 * Math.cbrt(Math.random());
+            const starTheta3 = Math.random() * Math.PI * 2;
+            const starU3 = Math.random() * 2 - 1;
+            const starS3 = Math.sqrt(1 - starU3 * starU3);
+            const posLine = new THREE.Vector3(
+                starR3 * starS3 * Math.cos(starTheta3),
+                starR3 * starS3 * Math.sin(starTheta3),
+                starR3 * starU3
+            );
+
+            // Level 4 starfield position
+            const starR = SCATTER_RADIUS * 1.15 * Math.cbrt(Math.random());
+            const starTheta = Math.random() * Math.PI * 2;
+            const starU = Math.random() * 2 - 1;
+            const starS = Math.sqrt(1 - starU * starU);
+            const posStarfield = new THREE.Vector3(
+                starR * starS * Math.cos(starTheta),
+                starR * starS * Math.sin(starTheta),
+                starR * starU
+            );
+
+            return { posHeart, posScatterLevel2, posLine, posStarfield, layer, x, y };
+        }
+
+        // ============================================================
+        // NODE GROUP (Interactive heart nodes)
+        // ============================================================
+        const nodeMaterial = new THREE.SpriteMaterial({
+            map: nodeTexture,
+            color: 0xffffff,
+            transparent: true,
+            depthWrite: false,
+            blending: THREE.NormalBlending,
+        });
+
+        const nodes = [];
+        const nodeGroup = new THREE.Group();
+        scene.add(nodeGroup);
+
+        // ============================================================
+        // PHOTO TEXTURES (loaded once)
+        // ============================================================
+        const photoLoader = new THREE.TextureLoader();
+        const photoTextures = [];
+        PHOTO_FILES.forEach((url, i) => {
+            photoLoader.load(
+                url,
+                (t) => {
+                    t.colorSpace = THREE.SRGBColorSpace;
+                    photoTextures[i] = t;
+                    if (i === PHOTO_FILES.length - 1) {
+                        applyCardTextures();
+                    }
+                },
+                undefined,
+                (err) => console.warn('Could not load', url, err)
+            );
+        });
+
+        function applyNodeTheme() {
+            haloMaterial.color.setHex(currentTheme.haloHex);
+            dustMaterial.color.setHex(currentTheme.dustHex);
+
+            const isEmerald = currentTheme.id === 'emerald';
+            const photosAvailable = photoTextures.length || PHOTO_FILES.length;
+            for (let i = 0; i < NODE_COUNT; i++) {
+                const node = nodes[i];
+                if (!node) continue;
+                const photoIndex = i % photosAvailable;
+
+                const c = new THREE.Color(currentTheme.coreColor);
+
+                node.sprite.material = nodeMaterial.clone();
+                node.sprite.material.map = nodeTexture;
+                node.sprite.material.color = c;
+            }
+        }
+
+        // Build nodes
+        for (let i = 0; i < NODE_COUNT; i++) {
+            const sprite = new THREE.Sprite(nodeMaterial.clone());
+            const { posHeart, posScatterLevel2, posLine, posStarfield, layer, x, y } = sampleNaturalHeartNode(i);
+            sprite.position.copy(posHeart);
+            sprite.scale.set(NODE_BASE_SIZE, NODE_BASE_SIZE, 1);
+
+            const node = {
+                sprite,
+                posHeart,
+                posScatterLevel2,
+                posLine,
+                posStarfield,
+                layer,
+                heartX: x,
+                heartY: y,
+                phase: Math.random() * Math.PI * 2,
+            };
+            nodes.push(node);
+            nodeGroup.add(sprite);
+        }
+
+        requestAnimationFrame(() => requestAnimationFrame(applyNodeTheme));
+
+        // ============================================================
+        // DYNAMIC HALO SYSTEM (fuzzy radiant corona)
+        // ============================================================
+        const haloGeometry = new THREE.BufferGeometry();
+        const haloPositions = new Float32Array(HALO_COUNT * 3);
+        const haloBasePositions = [];
+
+        const haloScale = HEART_SCALE / 17;
+        for (let i = 0; i < HALO_COUNT; i++) {
+            const { bx, by } = sampleContourUniform();
+            const dx = bx - CX;
+            const dy = by - CY;
+            const angle = Math.atan2(dy, dx);
+            const rayDepth = 0.35 + Math.pow(Math.random(), 1.8) * 2.0;
+            const jitterSide = (Math.random() - 0.5) * 0.6;
+            const z = (Math.random() - 0.5) * HEART_DEPTH * 1.5;
+
+            const hx = (bx + Math.cos(angle) * rayDepth - Math.sin(angle) * jitterSide) * haloScale;
+            const hy = ((by - CY) + Math.sin(angle) * rayDepth + Math.cos(angle) * jitterSide) * haloScale;
+
+            haloPositions[i * 3 + 0] = hx;
+            haloPositions[i * 3 + 1] = hy;
+            haloPositions[i * 3 + 2] = z;
+        }
+
+        haloGeometry.setAttribute('position', new THREE.BufferAttribute(haloPositions, 3));
+        const haloMaterial = new THREE.PointsMaterial({
+            size: 0.45,
+            map: haloTexture,
+            color: currentTheme.haloHex,
+            transparent: true,
+            blending: THREE.NormalBlending,
+            depthWrite: false,
+            opacity: 0.45,
+        });
+        const haloPoints = new THREE.Points(haloGeometry, haloMaterial);
+        nodeGroup.add(haloPoints);
+
+        // ============================================================
+        // DRIFTING FALLING SPARKLES (stardust from bottom tip)
+        // ============================================================
+        const dustGeometry = new THREE.BufferGeometry();
+        const dustPositions = new Float32Array(DUST_COUNT * 3);
+        const dustData = [];
+
+        const scaleFac = HEART_SCALE / 17;
+        for (let i = 0; i < DUST_COUNT; i++) {
+            const x = (Math.random() - 0.5) * 5.0 * scaleFac;
+            const y = (-17 - Math.random() - CY) * scaleFac - Math.random() * 18;
+            const z = (Math.random() - 0.5) * 4.0;
+            dustPositions[i * 3 + 0] = x;
+            dustPositions[i * 3 + 1] = y;
+            dustPositions[i * 3 + 2] = z;
+
+            dustData.push({
+                x, y, z,
+                vy: 0.6 + Math.random() * 1.2,
+                swaySpeed: 1.0 + Math.random() * 2.0,
+                swayAmp: 0.18 + Math.random() * 0.35,
+                phase: Math.random() * Math.PI * 2,
+            });
+        }
+
+        dustGeometry.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
+        const dustMaterial = new THREE.PointsMaterial({
+            size: 0.45,
+            map: haloTexture,
+            color: currentTheme.dustHex,
+            transparent: true,
+            blending: THREE.NormalBlending,
+            depthWrite: false,
+            opacity: 0.65,
+        });
+        const dustPoints = new THREE.Points(dustGeometry, dustMaterial);
+        nodeGroup.add(dustPoints);
+
+        // ============================================================
+        // IMAGE CARDS SYSTEM (Level 2 Floating & Level 3 Horizontal Line)
+        // 24 framed memory cards with glowing border and light node pin
+        // ============================================================
+        const CARD_COUNT = 24;
+        const imageCards = [];
+        const cardGroup = new THREE.Group();
+        scene.add(cardGroup);
+
+        // Create high-res rounded card frame border texture for white studio background
+        function createCardFrameTexture(primaryColor) {
+            const W = 360;
+            const H = 440;
+            const c = document.createElement('canvas');
+            c.width = W;
+            c.height = H;
+            const ctx = c.getContext('2d');
+
+            // 1. Soft realistic drop shadow baked into card canvas texture
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.14)';
+            ctx.shadowBlur = 18;
+            ctx.shadowOffsetY = 8;
+
+            // 2. Pure white card body
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.roundRect(14, 12, W - 28, H - 24, 20);
+            ctx.fill();
+
+            // Clear shadow for crisp interior graphics
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+
+            // 3. Elegant primary accent border
+            ctx.lineWidth = 3.5;
+            ctx.strokeStyle = primaryColor;
+            ctx.stroke();
+
+            // 4. Subtle inner bevel
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.beginPath();
+            ctx.roundRect(19, 17, W - 38, H - 34, 16);
+            ctx.stroke();
+
+            // 5. Photo cutout window frame
+            const photoX = 28;
+            const photoY = 26;
+            const photoW = W - 56;
+            const photoH = photoW;
+            ctx.fillStyle = '#f8fafc';
+            ctx.beginPath();
+            ctx.roundRect(photoX, photoY, photoW, photoH, 10);
+            ctx.fill();
+
+            // Crisp accent line around the photo
+            ctx.lineWidth = 2.0;
+            ctx.strokeStyle = primaryColor + '88';
+            ctx.stroke();
+
+            // 6. Polaroid chin bottom emblem
+            ctx.fillStyle = primaryColor;
+            ctx.font = 'bold 22px system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('♥', W / 2, H - 42);
+
+            const tex = new THREE.CanvasTexture(c);
+            tex.colorSpace = THREE.SRGBColorSpace;
+            return tex;
+        }
+        function createCardBackTexture(primaryColor) {
+            const W = 360;
+            const H = 440;
+            const c = document.createElement('canvas');
+            c.width = W;
+            c.height = H;
+            const ctx = c.getContext('2d');
+
+            // 1. Drop shadow (matches front)
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.14)';
+            ctx.shadowBlur = 18;
+            ctx.shadowOffsetY = 8;
+
+            // 2. Slightly tinted white card body
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.roundRect(14, 12, W - 28, H - 24, 20);
+            ctx.fill();
+
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+
+            // 3. Primary accent border (same as front)
+            ctx.lineWidth = 3.5;
+            ctx.strokeStyle = primaryColor;
+            ctx.stroke();
+
+            // 4. Inner decorative border
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = primaryColor + '44';
+            ctx.beginPath();
+            ctx.roundRect(28, 26, W - 56, H - 52, 14);
+            ctx.stroke();
+
+            // 5. Second inner decorative border
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = primaryColor + '30';
+            ctx.beginPath();
+            ctx.roundRect(38, 36, W - 76, H - 72, 10);
+            ctx.stroke();
+
+            // 6. Decorative pattern — diamond lattice
+            ctx.strokeStyle = primaryColor + '18';
+            ctx.lineWidth = 0.8;
+            const spacing = 24;
+            for (let i = -10; i < 20; i++) {
+                ctx.beginPath();
+                ctx.moveTo(50, 50 + i * spacing);
+                ctx.lineTo(50 + (W - 100), 50 + i * spacing + (W - 100));
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(W - 50, 50 + i * spacing);
+                ctx.lineTo(W - 50 - (W - 100), 50 + i * spacing + (W - 100));
+                ctx.stroke();
+            }
+
+            // 7. Center heart emblem (larger)
+            ctx.fillStyle = primaryColor;
+            ctx.font = 'bold 64px system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('♥', W / 2, H / 2 - 10);
+
+            // 8. Small decorative text
+            ctx.fillStyle = primaryColor + '88';
+            ctx.font = '14px system-ui, sans-serif';
+            ctx.fillText('HOPE', W / 2, H / 2 + 40);
+
+            // 9. Corner ornaments
+            const ornSize = 16;
+            ctx.fillStyle = primaryColor + '55';
+            [
+                [44, 42], [W - 44, 42],
+                [44, H - 42], [W - 44, H - 42]
+            ].forEach(([ox, oy]) => {
+                ctx.beginPath();
+                ctx.arc(ox, oy, ornSize / 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            const tex = new THREE.CanvasTexture(c);
+            tex.colorSpace = THREE.SRGBColorSpace;
+            return tex;
+        }
+
+        let cardFrameTexture = createCardFrameTexture(currentTheme.primary);
+        let cardBackTexture = createCardBackTexture(currentTheme.primary);
+
+        // Choose 24 distributed anchor node indices from the heart nodes
+        const cardAnchorStep = Math.floor(NODE_COUNT / CARD_COUNT);
+        for (let k = 0; k < CARD_COUNT; k++) {
+            const photoIndex = k % PHOTO_FILES.length;
+            const anchorIdx = (k * cardAnchorStep + (k % 5) * 23) % NODE_COUNT;
+            const anchorNode = nodes[anchorIdx];
+
+            // Card container group — contains a front group and a back group
+            const cardGroupMesh = new THREE.Group();
+
+            // Front face group (frame + photo + pin)
+            const frontGroup = new THREE.Group();
+
+            // Frame mesh (with elegant white polaroid frame texture)
+            const frameMat = new THREE.MeshBasicMaterial({
+                map: cardFrameTexture,
+                transparent: true,
+                side: THREE.FrontSide,
+            });
+            const frameGeom = new THREE.PlaneGeometry(2.7, 3.3);
+            const frameMesh = new THREE.Mesh(frameGeom, frameMat);
+            frontGroup.add(frameMesh);
+
+            // Inset photo mesh
+            const photoMat = new THREE.MeshBasicMaterial({
+                map: photoTextures[photoIndex] || null,
+                transparent: true,
+                side: THREE.FrontSide,
+            });
+            const photoGeom = new THREE.PlaneGeometry(2.28, 2.28);
+            const photoMesh = new THREE.Mesh(photoGeom, photoMat);
+            photoMesh.position.set(0, 0.32, 0.02);
+            frontGroup.add(photoMesh);
+
+            cardGroupMesh.add(frontGroup);
+
+            // Back face mesh (decorative back design, rotated 180° on Y)
+            const backMat = new THREE.MeshBasicMaterial({
+                map: cardBackTexture,
+                transparent: true,
+                side: THREE.FrontSide,
+            });
+            const backGeom = new THREE.PlaneGeometry(2.7, 3.3);
+            const backMesh = new THREE.Mesh(backGeom, backMat);
+            backMesh.rotation.y = Math.PI; // face backwards
+            backMesh.position.z = -0.01;
+            cardGroupMesh.add(backMesh);
+
+            // Light node pin on top of the frame
+            const pinMat = new THREE.SpriteMaterial({
+                map: nodeTexture,
+                color: new THREE.Color(currentTheme.primary),
+                transparent: true,
+                blending: THREE.NormalBlending,
+            });
+            const pinSprite = new THREE.Sprite(pinMat);
+            pinSprite.scale.set(NODE_BASE_SIZE * 2.1, NODE_BASE_SIZE * 2.1, 1);
+            pinSprite.position.set(0, 1.68, 0.04);
+            cardGroupMesh.add(pinSprite);
+
+            // Level 1 position (at the heart node)
+            const posLevel1 = anchorNode.posHeart.clone();
+
+            // Level 2 position: clustered memories around the heart area
+            const tAngle = (k / CARD_COUNT) * Math.PI * 2;
+            const hx = 16 * Math.pow(Math.sin(tAngle), 3);
+            const hy = 13 * Math.cos(tAngle) - 5 * Math.cos(2*tAngle) - 2 * Math.cos(3*tAngle) - Math.cos(4*tAngle);
+            const scaleFac = HEART_SCALE / 17;
+            const spreadRad = 1.4 + (k % 3) * 0.2;
+            const posLevel2 = new THREE.Vector3(
+                hx * scaleFac * spreadRad + ((k * 7) % 5 - 2) * 0.8,
+                (hy - CY) * scaleFac * spreadRad + ((k * 11) % 5 - 2) * 0.8,
+                ((k % 7) - 3) * 1.5
+            );
+
+            cardGroupMesh.position.copy(posLevel1);
+            cardGroupMesh.scale.set(0.0001, 0.0001, 1); // start hidden in Level 1
+
+            const cardObj = {
+                mesh: cardGroupMesh,
+                frontGroup,
+                frameMesh,
+                frameMat,
+                photoMesh,
+                photoMat,
+                backMesh,
+                backMat,
+                pinSprite,
+                photoIndex,
+                anchorNode,
+                posLevel1,
+                posLevel2,
+                hovered: false,
+                currentScale: 0.0001,
+                targetScale: 0.0001,
+                bobPhase: Math.random() * Math.PI * 2,
+                // Flip state
+                flipped: false,
+                flipAngle: 0,        // current Y rotation from flip (radians)
+                targetFlipAngle: 0,  // target Y rotation (0 = front, PI = back)
+            };
+
+            cardGroupMesh.userData = { isCard: true, cardObj, photoIndex };
+            frameMesh.userData = { isCard: true, cardObj, photoIndex };
+            photoMesh.userData = { isCard: true, cardObj, photoIndex };
+            backMesh.userData = { isCard: true, cardObj, photoIndex };
+
+            imageCards.push(cardObj);
+            cardGroup.add(cardGroupMesh);
+        }
+
+        function applyCardTextures() {
+            cardFrameTexture = createCardFrameTexture(currentTheme.primary);
+            cardBackTexture = createCardBackTexture(currentTheme.primary);
+            imageCards.forEach((c) => {
+                if (photoTextures[c.photoIndex]) {
+                    c.photoMat.map = photoTextures[c.photoIndex];
+                    c.photoMat.needsUpdate = true;
+                }
+                c.frameMat.map = cardFrameTexture;
+                c.frameMat.needsUpdate = true;
+                c.backMat.map = cardBackTexture;
+                c.backMat.needsUpdate = true;
+                if (c.pinSprite) {
+                    c.pinSprite.material.map = nodeTexture;
+                    c.pinSprite.material.color.set(currentTheme.primary);
+                }
+            });
+        }
+
+        // ============================================================
+        // LEVEL 3: 3D CIRCULAR CAROUSEL SETUP
+        // ============================================================
+        const CIRCLE_RADIUS = 15.5;
+
+        // Invisible hit ring attached to cardGroup for testing if mouse drags on the cards circle
+        const hitRingGeom = new THREE.RingGeometry(CIRCLE_RADIUS - 3.5, CIRCLE_RADIUS + 3.5, 64);
+        hitRingGeom.rotateX(-Math.PI / 2);
+        const cardsHitRing = new THREE.Mesh(
+            hitRingGeom,
+            new THREE.MeshBasicMaterial({
+                transparent: true,
+                opacity: 0,
+                depthWrite: false,
+                side: THREE.DoubleSide
+            })
+        );
+        cardGroup.add(cardsHitRing);
+
+        // ============================================================
+        // LEVEL STATE MANAGEMENT & TRANSITION
+        // ============================================================
+        // Level progress ranges smoothly from 0.0 to 3.0:
+        // 0.0 = Level 1 (Heart - 0 scrolls)
+        // 1.0 = Level 2 (Scattered Memories - 1 scroll)
+        // 2.0 = Level 3 (3D Memory Carousel - 2 scrolls)
+        // 3.0 = Level 4 (Letters View - 3 scrolls)
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialLevelParam = parseInt(urlParams.get('level'), 10);
+        let currentLevel = (!isNaN(initialLevelParam) && initialLevelParam >= 1 && initialLevelParam <= 4) ? (initialLevelParam - 1) : 0;
+        let levelProgress = currentLevel;
+        let targetLevelProgress = currentLevel;
+
+        // Set initial camera Z if starting at a higher level
+        if (levelProgress >= 2.5) {
+            camera.position.z = 30;
+        } else if (levelProgress >= 1.5) {
+            camera.position.set(0, 5.8, 29.5);
+        } else if (levelProgress >= 0.5) {
+            camera.position.z = 22;
+        }
+        if (levelProgress >= 0.5 && levelProgress < 2.5) {
+            imageCards.forEach(c => {
+                c.currentScale = c.targetScale = 1.0;
+                c.mesh.scale.set(1, 1, 1);
+            });
+        }
+
+        // Level 3 circular carousel rotation angle
+        let galleryAngle = 0.0;
+        let targetGalleryAngle = 0.0;
+        let galleryAngleVelocity = 0.0;
+
+        const levelBtns = document.querySelectorAll('.level-btn');
+        const levelSubtitle = document.getElementById('level-subtitle');
+        const levelHint = document.getElementById('level-hint');
+        const lettersContainer = document.getElementById('letters-container');
+
+        const LEVEL_META = [
+            { name: "Level 1 · Natural Heart", hint: "Drag · Rotate &nbsp;·&nbsp; Scroll Down (1 scroll) · Memories" },
+            { name: "Level 2 · Scattered Memories", hint: "Tap · View Image &nbsp;·&nbsp; Scroll Down (2 scrolls) · Carousel &nbsp;·&nbsp; Scroll Up · Heart" },
+            { name: "Level 3 · 3D Memory Carousel", hint: "Drag Cards · Spin Carousel &nbsp;·&nbsp; Drag Background · Rotate 3D &nbsp;·&nbsp; Tap · View Image" },
+            { name: "Level 4 · Romantic Letters", hint: "Click · Read Letter 💌 &nbsp;·&nbsp; Scroll Up · Return to Carousel" },
+        ];
+
+        function goToLevel(newLevel) {
+            const clamped = Math.max(0, Math.min(3, Math.round(newLevel)));
+            if (clamped !== currentLevel) {
+                currentLevel = clamped;
+                targetLevelProgress = currentLevel;
+            }
+        }
+
+        function setTargetLevel(idx) {
+            goToLevel(idx);
+        }
+
+        levelBtns.forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                const lvl = parseInt(e.currentTarget.dataset.level, 10);
+                goToLevel(lvl);
+            });
+        });
+
+        // ============================================================
+        // DISCRETE SCROLL CONTROLLER
+        // Level 1: 0 scroll
+        // Level 2: 1 scroll
+        // Level 3: 2 scrolls
+        // Level 4: 3 scrolls
+        // ============================================================
+        let isScrollLocked = false;
+        let lastWheelTime = 0;
+        let accumulatedDeltaY = 0;
+
+        function handleScrollStep(dir) {
+            if (dir > 0) {
+                if (currentLevel < 3) {
+                    goToLevel(currentLevel + 1);
+                    return true;
+                }
+            } else if (dir < 0) {
+                if (currentLevel > 0) {
+                    goToLevel(currentLevel - 1);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        window.addEventListener('wheel', (e) => {
+            // Lightbox and letter modal handle their own scrolling
+            if (lb && lb.classList.contains('open')) return;
+            if (letterModal && letterModal.classList.contains('open')) return;
+
+            // In Level 4, if scrolling within letters grid, allow normal reading scroll
+            if (currentLevel === 3) {
+                const targetGrid = e.target.closest('.letters-grid');
+                if (targetGrid) {
+                    if (e.deltaY > 0) return;
+                    if (e.deltaY < 0 && targetGrid.scrollTop > 5) return;
+                }
+            }
+
+            // In Level 3 (3D Circular Carousel): Horizontal trackpad swipe spins the carousel
+            if (currentLevel === 2 && Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.2 && Math.abs(e.deltaX) > 8) {
+                targetGalleryAngle -= e.deltaX * 0.0035;
+                return;
+            }
+
+            e.preventDefault();
+
+            const now = Date.now();
+            if (isScrollLocked) {
+                lastWheelTime = now;
+                return;
+            }
+
+            // Reset accumulator if user stopped scrolling for > 200ms
+            if (now - lastWheelTime > 200) {
+                accumulatedDeltaY = 0;
+            }
+            lastWheelTime = now;
+            accumulatedDeltaY += e.deltaY;
+
+            const SCROLL_THRESHOLD = 30;
+            if (Math.abs(accumulatedDeltaY) >= SCROLL_THRESHOLD) {
+                const dir = accumulatedDeltaY > 0 ? 1 : -1;
+                const changed = handleScrollStep(dir);
+                accumulatedDeltaY = 0;
+                if (changed) {
+                    isScrollLocked = true;
+                    setTimeout(() => {
+                        isScrollLocked = false;
+                        accumulatedDeltaY = 0;
+                    }, 600);
+                }
+            }
+        }, { passive: false });
+
+        // Touch swipe support for 1 swipe = 1 level transition
+        let touchStartY = 0;
+        let touchStartX = 0;
+        window.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                touchStartY = e.touches[0].clientY;
+                touchStartX = e.touches[0].clientX;
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchend', (e) => {
+            if (lb && lb.classList.contains('open')) return;
+            if (letterModal && letterModal.classList.contains('open')) return;
+            if (e.changedTouches.length !== 1) return;
+
+            const dy = touchStartY - e.changedTouches[0].clientY;
+            const dx = touchStartX - e.changedTouches[0].clientX;
+
+            if (currentLevel === 2 && Math.abs(dx) > Math.abs(dy)) return;
+
+            if (Math.abs(dy) > 40 && !isScrollLocked) {
+                const dir = dy > 0 ? 1 : -1;
+                const changed = handleScrollStep(dir);
+                if (changed) {
+                    isScrollLocked = true;
+                    setTimeout(() => {
+                        isScrollLocked = false;
+                    }, 600);
+                }
+            }
+        }, { passive: true });
+
+        // ============================================================
+        // POINTER & INTERACTION (Drag Rotate, Gallery Slide, Taps)
+        // ============================================================
+        const raycaster = new THREE.Raycaster();
+        const pointerNdc = new THREE.Vector2(2, 2);
+        let pointerActive = false;
+
+        let isDragging = false;
+        let dragMoved = false;
+        let dragMode = 'scene'; // 'cardsCircle' or 'scene'
+        const prevPointer = { x: 0, y: 0 };
+        const pointerDownPos = { x: 0, y: 0 };
+        const rotVelocity = { x: 0, y: 0 };
+        let hoveredCard = null;
+
+        function isPointerOnCardsCircle(ndc) {
+            raycaster.setFromCamera(ndc, camera);
+            const cardHits = raycaster.intersectObjects(imageCards.map(c => c.mesh), true);
+            if (cardHits.length > 0) return true;
+            const ringHits = raycaster.intersectObject(cardsHitRing, false);
+            return ringHits.length > 0;
+        }
+
+        canvas.addEventListener('pointerdown', (e) => {
+            if (e.button !== 0 && e.pointerType === 'mouse') return;
+            isDragging = true;
+            dragMoved = false;
+            prevPointer.x = e.clientX;
+            prevPointer.y = e.clientY;
+            pointerDownPos.x = e.clientX;
+            pointerDownPos.y = e.clientY;
+            rotVelocity.x = 0;
+            rotVelocity.y = 0;
+
+            const rect = canvas.getBoundingClientRect();
+            pointerNdc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            pointerNdc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            pointerActive = true;
+
+            // In Level 3: Only move the cards circle horizontal if mouse drag is on the cards circle!
+            if (levelProgress > 1.4 && levelProgress < 2.6) {
+                dragMode = isPointerOnCardsCircle(pointerNdc) ? 'cardsCircle' : 'scene';
+            } else {
+                dragMode = 'scene';
+            }
+
+            canvas.classList.add('grabbing');
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            pointerNdc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            pointerNdc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            pointerActive = true;
+
+            if (!isDragging) return;
+
+            const dx = e.clientX - prevPointer.x;
+            const dy = e.clientY - prevPointer.y;
+
+            const totalDist = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
+            if (totalDist > 6) {
+                dragMoved = true;
+            }
+
+            // In Level 3: Only move the cards circle horizontal if mouse drag is on the cards circle position!
+            if (levelProgress > 1.4 && levelProgress < 2.6 && dragMode === 'cardsCircle') {
+                const spinSens = 0.0055;
+                targetGalleryAngle += dx * spinSens;
+                galleryAngleVelocity = dx * spinSens * 0.45;
+            } else {
+                // Drag rotates the 3D card circle / scene in 3D
+                const rotSpeed = 0.0055;
+                nodeGroup.rotation.y += dx * rotSpeed;
+                nodeGroup.rotation.x = Math.max(-1.15, Math.min(1.15, nodeGroup.rotation.x + dy * rotSpeed));
+                cardGroup.rotation.copy(nodeGroup.rotation);
+
+                rotVelocity.y = dx * rotSpeed * 0.45;
+                rotVelocity.x = dy * rotSpeed * 0.45;
+            }
+
+            prevPointer.x = e.clientX;
+            prevPointer.y = e.clientY;
+        });
+
+        window.addEventListener('pointerup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            canvas.classList.remove('grabbing');
+        });
+
+        canvas.addEventListener('pointerleave', () => {
+            pointerActive = false;
+            pointerNdc.set(2, 2);
+        });
+
+        canvas.addEventListener('click', () => {
+            // If user clicked (not dragged) on an image card in Level 2 or Level 3
+            if (!dragMoved && hoveredCard) {
+                // Toggle flip: tap to flip, tap front again to open lightbox
+                hoveredCard.flipped = !hoveredCard.flipped;
+                hoveredCard.targetFlipAngle = hoveredCard.flipped ? Math.PI : 0;
+
+                // If card was flipped back to front, open lightbox
+                if (!hoveredCard.flipped) {
+                    openLightbox(hoveredCard.photoIndex);
+                }
+            }
+        });
+
+        // Find hovered image card (checks recursive card children)
+        function checkCardHover() {
+            if (!pointerActive || levelProgress < 0.4 || levelProgress > 2.6) {
+                return null;
+            }
+            raycaster.setFromCamera(pointerNdc, camera);
+            const meshes = imageCards.map(c => c.mesh);
+            const hits = raycaster.intersectObjects(meshes, true);
+            if (!hits.length) return null;
+            let obj = hits[0].object;
+            while (obj && !obj.userData.cardObj) {
+                obj = obj.parent;
+            }
+            return obj ? obj.userData.cardObj : null;
+        }
+
+        // Camera parallax & perspective
+        const camTarget = new THREE.Vector3(0, 0, 32);
+        function updateCamera(dt) {
+            // Base camera position by level:
+            // Level 1 = (0, 0, 32)
+            // Level 2 = (0, 0, 22) (~70% zoom)
+            // Level 3 = (0, 5.8, 29.5) (Elevated perspective tilted down at 3D circle carousel!)
+            // Level 4 = (0, 0, 30)
+            let targetX = 0;
+            let targetY = 0;
+            let targetZ = 32;
+
+            if (levelProgress <= 1.0) {
+                targetZ = THREE.MathUtils.lerp(32, 22, levelProgress);
+                targetY = 0;
+            } else if (levelProgress <= 2.0) {
+                const frac = THREE.MathUtils.smoothstep(levelProgress, 1.0, 2.0);
+                targetY = THREE.MathUtils.lerp(0, 5.8, frac);
+                targetZ = THREE.MathUtils.lerp(22, 29.5, frac);
+            } else {
+                const frac = THREE.MathUtils.smoothstep(levelProgress, 2.0, 3.0);
+                targetY = THREE.MathUtils.lerp(5.8, 0, frac);
+                targetZ = THREE.MathUtils.lerp(29.5, 30, frac);
+            }
+
+            let parallaxX = 0;
+            let parallaxY = 0;
+            if (pointerActive && !isDragging) {
+                parallaxX = pointerNdc.x * (levelProgress > 1.5 ? 1.5 : 4.0);
+                parallaxY = pointerNdc.y * (levelProgress > 1.5 ? 1.0 : 3.0);
+            }
+
+            camTarget.set(targetX + parallaxX, targetY + parallaxY, targetZ);
+            camera.position.lerp(camTarget, 0.06);
+            camera.lookAt(0, 0, 0);
+        }
+
+        // ============================================================
+        // THEME TOGGLE
+        // ============================================================
+        const themeBtn = document.getElementById('theme-btn');
+        const themeIcon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+        const pageTitle = document.getElementById('page-title');
+
+        function setTheme(theme) {
+            currentTheme = theme;
+            document.documentElement.style.setProperty('--bg-0', theme.bg0);
+            document.documentElement.style.setProperty('--bg-1', theme.bg1);
+            document.documentElement.style.setProperty('--primary', theme.primary);
+            document.documentElement.style.setProperty('--primary-soft', theme.primarySoft);
+            document.documentElement.style.setProperty('--primary-glow', theme.primaryGlow);
+            document.documentElement.style.setProperty('--panel', theme.panel);
+            document.documentElement.style.setProperty('--panel-border', theme.panelBorder);
+            document.documentElement.style.setProperty('--text', theme.text);
+            document.documentElement.style.setProperty('--muted', theme.muted);
+
+            pageTitle.textContent = theme.title;
+            themeIcon.textContent = theme.icon;
+            themeText.textContent = theme.name;
+
+            applyNodeTheme();
+            applyCardTextures();
+        }
+
+        themeBtn.addEventListener('click', () => {
+            const next = currentTheme.id === 'rose' ? THEMES.emerald : THEMES.rose;
+            setTheme(next);
+        });
+
+        if (urlParams.get('theme') === 'rose') {
+            setTheme(THEMES.rose);
+        } else {
+            setTheme(THEMES.emerald);
+        }
+
+        // ============================================================
+        // LEVEL 4: LETTERS VIEW SETUP
+        // ============================================================
+        const lettersGrid = document.getElementById('letters-grid');
+        const letterModal = document.getElementById('letter-modal');
+        const letterClose = document.getElementById('letter-close');
+        const letterModalTitle = document.getElementById('letter-modal-title');
+        const letterModalDate = document.getElementById('letter-modal-date');
+        const letterModalBody = document.getElementById('letter-modal-body');
+
+        function renderLettersList() {
+            lettersGrid.innerHTML = '';
+            LETTERS.forEach((l) => {
+                const card = document.createElement('div');
+                card.className = 'letter-card';
+                card.innerHTML = `
+                    <div class="letter-header">
+                        <span class="letter-seal">💌</span>
+                        <span class="letter-date">${l.date}</span>
+                    </div>
+                    <div class="letter-title">${l.title}</div>
+                    <div class="letter-excerpt">${l.excerpt}</div>
+                    <div class="letter-action">Open Letter &nbsp;›</div>
+                `;
+                card.addEventListener('click', () => openLetter(l));
+                lettersGrid.appendChild(card);
+            });
+        }
+        renderLettersList();
+
+        function openLetter(letter) {
+            letterModalTitle.textContent = letter.title;
+            letterModalDate.textContent = letter.date;
+            letterModalBody.textContent = letter.content;
+            letterModal.classList.add('open');
+        }
+        function closeLetter() {
+            letterModal.classList.remove('open');
+        }
+        letterClose.addEventListener('click', closeLetter);
+        letterModal.addEventListener('click', (e) => {
+            if (e.target === letterModal) closeLetter();
+        });
+
+        if (urlParams.get('letter') !== null) {
+            const lIdx = parseInt(urlParams.get('letter'), 10);
+            if (LETTERS[lIdx]) openLetter(LETTERS[lIdx]);
+        }
+
+        // ============================================================
+        // LIGHTBOX CANVAS (Image Canvas Viewer)
+        // ============================================================
+        const lb          = document.getElementById('lightbox');
+        const lbCanvas    = document.getElementById('lightbox-canvas');
+        const lbCtx       = lbCanvas.getContext('2d');
+        const lbCaption   = document.getElementById('lb-caption');
+        const lbCloseBtn  = document.getElementById('lb-close');
+        const lbPrevBtn   = document.getElementById('lb-prev');
+        const lbNextBtn   = document.getElementById('lb-next');
+
+        const lbState = {
+            index: 0,
+            image: null,
+            scale: 1,
+            minScale: 1,
+            offsetX: 0,
+            offsetY: 0,
+            dragging: false,
+            dragStart: { x: 0, y: 0, ox: 0, oy: 0 },
+        };
+
+        function syncLightboxCanvasSize() {
+            if (!lbState.image) return;
+            const cssW = lbCanvas.clientWidth;
+            const cssH = lbCanvas.clientHeight;
+            const dpr  = Math.min(window.devicePixelRatio, 2);
+            const targetW = Math.floor(cssW * dpr);
+            const targetH = Math.floor(cssH * dpr);
+            if (lbCanvas.width !== targetW)  lbCanvas.width  = targetW;
+            if (lbCanvas.height !== targetH) lbCanvas.height = targetH;
+        }
+
+        function fitImageToCanvas() {
+            if (!lbState.image) return;
+            syncLightboxCanvasSize();
+            const vw = lbCanvas.clientWidth;
+            const vh = lbCanvas.clientHeight;
+            const iw = lbState.image.width;
+            const ih = lbState.image.height;
+            lbState.scale = Math.min(vw / iw, vh / ih) * 0.92;
+            lbState.minScale = lbState.scale;
+            lbState.offsetX = 0;
+            lbState.offsetY = 0;
+            drawLightbox();
+        }
+
+        function drawLightbox() {
+            if (!lbState.image) return;
+            const w = lbCanvas.width;
+            const h = lbCanvas.height;
+            lbCtx.fillStyle = '#ffffff';
+            lbCtx.fillRect(0, 0, w, h);
+            const iw = lbState.image.width  * lbState.scale;
+            const ih = lbState.image.height * lbState.scale;
+            const x = (w - iw) / 2 + lbState.offsetX;
+            const y = (h - ih) / 2 + lbState.offsetY;
+            lbCtx.drawImage(lbState.image, x, y, iw, ih);
+        }
+
+        function loadLightboxImage(idx) {
+            if (photoTextures.length === 0) return;
+            idx = ((idx % photoTextures.length) + photoTextures.length) % photoTextures.length;
+            lbState.index = idx;
+            const tex = photoTextures[idx];
+            if (!tex || !tex.image) {
+                setTimeout(() => loadLightboxImage(idx), 80);
+                return;
+            }
+            lbState.image = tex.image;
+            lbCaption.textContent = `${idx + 1} / ${photoTextures.length}`;
+            fitImageToCanvas();
+        }
+
+        function openLightbox(idx) {
+            lb.classList.add('open');
+            lb.setAttribute('aria-hidden', 'false');
+            loadLightboxImage(idx);
+        }
+        function closeLightbox() {
+            lb.classList.remove('open');
+            lb.setAttribute('aria-hidden', 'true');
+        }
+
+        lbCloseBtn.addEventListener('click', closeLightbox);
+        lbPrevBtn .addEventListener('click', () => loadLightboxImage(lbState.index - 1));
+        lbNextBtn .addEventListener('click', () => loadLightboxImage(lbState.index + 1));
+
+        if (urlParams.get('lightbox') !== null) {
+            const pIdx = parseInt(urlParams.get('lightbox'), 10);
+            setTimeout(() => openLightbox(pIdx), 150);
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (lb.classList.contains('open')) {
+                if (e.key === 'Escape')     closeLightbox();
+                if (e.key === 'ArrowLeft')  loadLightboxImage(lbState.index - 1);
+                if (e.key === 'ArrowRight') loadLightboxImage(lbState.index + 1);
+                return;
+            }
+            if (letterModal.classList.contains('open')) {
+                if (e.key === 'Escape') closeLetter();
+                return;
+            }
+            if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+                e.preventDefault();
+                handleScrollStep(1);
+            } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+                e.preventDefault();
+                handleScrollStep(-1);
+            }
+        });
+
+        lbCanvas.addEventListener('wheel', (e) => {
+            if (!lb.classList.contains('open')) return;
+            e.preventDefault();
+            const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+            lbState.scale = Math.max(lbState.minScale * 0.9, Math.min(8, lbState.scale * factor));
+            drawLightbox();
+        }, { passive: false });
+
+        lbCanvas.addEventListener('pointerdown', (e) => {
+            lbState.dragging = true;
+            lbState.dragStart.x = e.clientX;
+            lbState.dragStart.y = e.clientY;
+            lbState.dragStart.ox = lbState.offsetX;
+            lbState.dragStart.oy = lbState.offsetY;
+            lbCanvas.classList.add('dragging');
+        });
+        window.addEventListener('pointermove', (e) => {
+            if (!lbState.dragging) return;
+            lbState.offsetX = lbState.dragStart.ox + (e.clientX - lbState.dragStart.x);
+            lbState.offsetY = lbState.dragStart.oy + (e.clientY - lbState.dragStart.y);
+            drawLightbox();
+        });
+        window.addEventListener('pointerup', () => {
+            lbState.dragging = false;
+            lbCanvas.classList.remove('dragging');
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            if (lb.classList.contains('open')) fitImageToCanvas();
+        });
+
+        // ============================================================
+        // ANIMATION LOOP & MULTI-LEVEL TRANSITIONS
+        // ============================================================
+        const progressBar = document.getElementById('progress-bar');
+        const clock = new THREE.Clock();
+
+        function animate() {
+            const dt = Math.min(clock.getDelta(), 0.05);
+            const elapsedTime = clock.getElapsedTime();
+
+            // Smooth level interpolation
+            levelProgress += (targetLevelProgress - levelProgress) * Math.min(1, SMOOTH * dt);
+
+            // Level 3 3D circular carousel rotation inertia
+            if (!isDragging) {
+                targetGalleryAngle += galleryAngleVelocity;
+                galleryAngleVelocity *= 0.90;
+            }
+            galleryAngle += (targetGalleryAngle - galleryAngle) * Math.min(1, 8.0 * dt);
+
+            // Card hover detection
+            const currentHover = checkCardHover();
+            if (currentHover !== hoveredCard) {
+                hoveredCard = currentHover;
+            }
+            canvas.classList.toggle('pointer', !!hoveredCard);
+
+            // 1. Particle Nodes visibility, size & movement across levels
+            // Level 1: Fully visible heart nodes (size: 0.44, opacity: 1.0)
+            // Level 2: Expansive 3D volumetric constellation (size: 0.40, opacity: 0.85)
+            // Level 3: Fills the space with small light nodes like Level 4 (size: 0.23, opacity: 0.58)
+            // Level 4: Dreamy romantic starfield (size: 0.21, opacity: 0.45)
+            let nodeAlpha = 1.0;
+            let nodeSize = NODE_BASE_SIZE;
+
+            if (levelProgress <= 1.0) {
+                nodeAlpha = THREE.MathUtils.lerp(1.0, 0.85, levelProgress);
+                nodeSize = THREE.MathUtils.lerp(NODE_BASE_SIZE, NODE_BASE_SIZE * 0.90, levelProgress);
+            } else if (levelProgress <= 2.0) {
+                const frac = levelProgress - 1.0;
+                nodeAlpha = THREE.MathUtils.lerp(0.85, 0.58, frac);
+                nodeSize = THREE.MathUtils.lerp(NODE_BASE_SIZE * 0.90, NODE_BASE_SIZE * 0.52, frac);
+            } else {
+                const frac = levelProgress - 2.0;
+                nodeAlpha = THREE.MathUtils.lerp(0.58, 0.45, frac);
+                nodeSize = THREE.MathUtils.lerp(NODE_BASE_SIZE * 0.52, NODE_BASE_SIZE * 0.46, frac);
+            }
+
+            nodeGroup.visible = true;
+            for (let i = 0; i < NODE_COUNT; i++) {
+                const node = nodes[i];
+                node.sprite.material.opacity = nodeAlpha;
+                let px, py, pz;
+
+                if (levelProgress <= 1.0) {
+                    px = THREE.MathUtils.lerp(node.posHeart.x, node.posScatterLevel2.x, levelProgress);
+                    py = THREE.MathUtils.lerp(node.posHeart.y, node.posScatterLevel2.y, levelProgress);
+                    pz = THREE.MathUtils.lerp(node.posHeart.z, node.posScatterLevel2.z, levelProgress);
+                } else if (levelProgress <= 2.0) {
+                    const frac = levelProgress - 1.0;
+                    px = THREE.MathUtils.lerp(node.posScatterLevel2.x, node.posLine.x, frac);
+                    py = THREE.MathUtils.lerp(node.posScatterLevel2.y, node.posLine.y, frac);
+                    pz = THREE.MathUtils.lerp(node.posScatterLevel2.z, node.posLine.z, frac);
+                } else {
+                    const frac = levelProgress - 2.0;
+                    px = THREE.MathUtils.lerp(node.posLine.x, node.posStarfield.x, frac);
+                    py = THREE.MathUtils.lerp(node.posLine.y, node.posStarfield.y, frac);
+                    pz = THREE.MathUtils.lerp(node.posLine.z, node.posStarfield.z, frac);
+                }
+
+                node.sprite.position.set(px, py, pz);
+
+                // In Level 3 & Level 4: small light nodes with subtle twinkling
+                if (levelProgress > 1.2) {
+                    const twinkle = 1.0 + Math.sin(elapsedTime * 2.5 + node.phase) * 0.18;
+                    const s = nodeSize * twinkle;
+                    node.sprite.scale.set(s, s, 1);
+                } else {
+                    node.sprite.scale.set(nodeSize, nodeSize, 1);
+                }
+            }
+
+            // 2. Update Image Cards across levels
+            for (let k = 0; k < CARD_COUNT; k++) {
+                const card = imageCards[k];
+                const isHov = card === hoveredCard;
+
+                let targetX, targetY, targetZ;
+                const bob = Math.sin(elapsedTime * 2.5 + card.bobPhase) * 0.15;
+                const l1Pos = card.posLevel1;
+                const l2Pos = card.posLevel2;
+
+                // Level 3: 3D circular ring carousel
+                const theta = (k / CARD_COUNT) * Math.PI * 2 + galleryAngle;
+                const circleX = Math.sin(theta) * CIRCLE_RADIUS;
+                const circleZ = Math.cos(theta) * CIRCLE_RADIUS;
+                const circleY = Math.sin(elapsedTime * 2.0 + k * 0.45) * 0.09;
+
+                if (levelProgress <= 1.0) {
+                    targetX = THREE.MathUtils.lerp(l1Pos.x, l2Pos.x, levelProgress);
+                    targetY = THREE.MathUtils.lerp(l1Pos.y, l2Pos.y, levelProgress) + bob * levelProgress;
+                    targetZ = THREE.MathUtils.lerp(l1Pos.z, l2Pos.z, levelProgress);
+                    // Scale fades in smoothly between Level 1 and Level 2
+                    const l2Frac = Math.max(0, (levelProgress - 0.10) / 0.90);
+                    card.targetScale = l2Frac * (isHov ? 1.25 : 1.0);
+                } else if (levelProgress <= 2.0) {
+                    const frac = THREE.MathUtils.smoothstep(levelProgress, 1.0, 2.0);
+                    targetX = THREE.MathUtils.lerp(l2Pos.x, circleX, frac);
+                    targetY = THREE.MathUtils.lerp(l2Pos.y, circleY, frac) + bob * (1 - frac);
+                    targetZ = THREE.MathUtils.lerp(l2Pos.z, circleZ, frac);
+                    // Extra prominent scale in Level 3 for bigger image cards
+                    card.targetScale = isHov ? 1.40 : 1.15;
+                } else {
+                    // Level 4: Scale down and fade away
+                    const frac = levelProgress - 2.0;
+                    targetX = circleX;
+                    targetY = circleY - frac * 5;
+                    targetZ = circleZ - frac * 14;
+                    card.targetScale = Math.max(0.0001, (1.0 - frac * 1.6));
+                }
+
+                card.mesh.position.set(targetX, targetY, targetZ);
+                card.currentScale += (card.targetScale - card.currentScale) * Math.min(1, 10 * dt);
+                card.mesh.scale.set(card.currentScale, card.currentScale, 1);
+
+                // Card orientation:
+                // Level 1-2: flat relative to heart
+                // Level 3: elegant tangent curve along circle facing viewer (sin(theta) * 0.45)
+                let baseRotY = 0;
+                if (levelProgress <= 1.0) {
+                    baseRotY = 0;
+                } else if (levelProgress <= 2.0) {
+                    const frac = THREE.MathUtils.smoothstep(levelProgress, 1.0, 2.0);
+                    baseRotY = THREE.MathUtils.lerp(0, Math.sin(theta) * 0.45, frac);
+                } else {
+                    baseRotY = Math.sin(theta) * 0.45;
+                }
+
+                // Smooth flip animation
+                card.flipAngle += (card.targetFlipAngle - card.flipAngle) * Math.min(1, 8.0 * dt);
+                card.mesh.rotation.set(0, baseRotY + card.flipAngle, 0);
+            }
+
+            // 3. Update Halo & Dust opacities
+            // Halo and bottom falling sparkles are only active in Level 1 heart,
+            // fading away smoothly before Level 2 so Level 2 is purely scattered nodes and memories
+            const heartAtmosphere = Math.max(0, 1.0 - levelProgress * 1.6);
+            haloMaterial.opacity = 0.70 * heartAtmosphere;
+
+            const dustAlpha = 0.55 * heartAtmosphere;
+            dustMaterial.opacity = dustAlpha;
+
+            if (dustAlpha > 0.01) {
+                const dustPosAttr = dustGeometry.attributes.position;
+                const dustPosArr = dustPosAttr.array;
+                for (let i = 0; i < DUST_COUNT; i++) {
+                    const d = dustData[i];
+                    d.y -= d.vy * dt;
+                    const sway = Math.sin(elapsedTime * d.swaySpeed + d.phase) * d.swayAmp;
+                    if (d.y < -26 * scaleFac) {
+                        d.y = (-16.5 - CY) * scaleFac + Math.random() * 0.5;
+                        d.x = (Math.random() - 0.5) * 4.0 * scaleFac;
+                    }
+                    dustPosArr[i * 3 + 0] = d.x + sway;
+                    dustPosArr[i * 3 + 1] = d.y;
+                    dustPosArr[i * 3 + 2] = d.z;
+                }
+                dustPosAttr.needsUpdate = true;
+            }
+
+            // 4. Drag momentum & scene rotation
+            if (!isDragging) {
+                nodeGroup.rotation.y += rotVelocity.y;
+                nodeGroup.rotation.x = Math.max(-1.15, Math.min(1.15, nodeGroup.rotation.x + rotVelocity.x));
+                rotVelocity.y *= 0.92;
+                rotVelocity.x *= 0.92;
+
+                // Ambient drift in Level 1 & 2
+                if (levelProgress < 1.3) {
+                    nodeGroup.rotation.y += dt * 0.03;
+                }
+
+                // In Level 3, the card circle gently rotates continuously like a 3D carousel
+                if (levelProgress > 1.5 && levelProgress < 2.5) {
+                    targetGalleryAngle += dt * 0.08;
+                }
+            }
+
+            // The card circle rotates in 3D with the scene across all levels
+            cardGroup.rotation.copy(nodeGroup.rotation);
+
+            updateCamera(dt);
+
+            // 5. Update Level UI
+            const activeLevelIndex = Math.min(3, Math.round(levelProgress));
+            levelBtns.forEach((btn, idx) => {
+                btn.classList.toggle('active', idx === activeLevelIndex);
+            });
+
+            levelSubtitle.textContent = LEVEL_META[activeLevelIndex].name;
+            levelHint.innerHTML = LEVEL_META[activeLevelIndex].hint;
+            progressBar.style.width = `${((levelProgress / 3.0) * 100).toFixed(1)}%`;
+
+            // Level 4 Letters container visibility
+            lettersContainer.classList.toggle('active', levelProgress >= 2.6);
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        window.__heart = {
+            nodes,
+            imageCards,
+            get currentLevel() { return currentLevel; },
+            get levelProgress() { return levelProgress; },
+            goToLevel,
+            setTargetLevel,
+            handleScrollStep,
+            setTheme,
+        };
+    </script>
+</body>
+</html>
