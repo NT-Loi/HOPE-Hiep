@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tặng Út Khờ</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💚</text></svg>" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%22 y=%2255%22 font-size=%2258%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>💚</text></svg>" />
     <style>
         :root {
             /* Default: Rose Studio on pristine white/light background */
@@ -78,9 +78,12 @@
         }
 
         .web-logo {
-            font-size: 20px;
+            font-size: 13px;
             line-height: 1;
-            filter: drop-shadow(0 2px 6px rgba(76, 175, 80, 0.35));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(0 1px 4px rgba(76, 175, 80, 0.30));
         }
 
         .title {
@@ -412,6 +415,15 @@
             background: #000000;
         }
         #lightbox-canvas.dragging { cursor: grabbing; }
+        #lightbox-video {
+            max-width: 95vw;
+            max-height: 88vh;
+            display: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+            border-radius: 8px;
+            background: #000000;
+            outline: none;
+        }
 
         .lb-btn {
             position: absolute;
@@ -521,6 +533,7 @@
         <button class="lb-btn lb-prev"  id="lb-prev"  aria-label="Previous">‹</button>
         <button class="lb-btn lb-next"  id="lb-next"  aria-label="Next">›</button>
         <canvas id="lightbox-canvas"></canvas>
+        <video id="lightbox-video" controls playsinline preload="metadata"></video>
         <div class="lb-caption" id="lb-caption">1 / 4</div>
     </div>
 
@@ -669,8 +682,15 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
             "./img/2aOboQx0fvugYj8kgXEnio7tqk9pXqXjZf7EbbzE.jpg",
             "./img/2aOboQx0fvunrBxtC9rNFoiQaOOd7rjFwKjvrxeS.jpg",
             "./img/2aOboQx0fwmaxetcHqBHZw5G2iEFAVVNQnZAzRb6.jpg",
+            "./img/2aOboQx0fwp4DRdxlxD5c9KTwErEZRTBR7KCUJ8q.mp4",
+            "./img/2aOboQx0fz0fJ1o5LZvIz1j5eeAcOmHB6LiD3zIu.mp4",
+            "./img/2aOboQx0g1Of6FVzyopt6OsSfp7bEZkGh3SCNvkm.mp4",
+            "./img/2aOboQx0g3QnvoklFOu425P75C2CDsFk1h8Okb4a.mp4",
             "./img/2aOboQx0gFQ5Euxhv0vFgRZXXbk7DNvfz0OZL7K4.jpg",
             "./img/2aOboQx0gFT1gXa8faTZziRWAKCkZQYQZOlVDTl2.jpg",
+            "./img/2aOboQx0gGFnPrPo6iso7vduiU2WPVLcRC8MEfaq.mp4",
+            "./img/2aOboQx0gO40Dhg6wHWMjTkz6MJM88v0hAW0y4ie.mp4",
+            "./img/2aOboQx0hU2c0UGnhC6vENvF28XEwI9rnOTnKhjU.mp4",
             "./img/2aOboQx0hU2jIvfTQmliu2fItJ5a54hH4tZNBCkq.jpg",
             "./img/2aOboQx0hU6NXLEjF63UPNG4CK4DepRXCUO21ez2.jpg",
             "./img/2aOboQx0hU7zH1qGsbtK1C6r8qAwHOiw2K9JpSfg.jpg",
@@ -678,7 +698,48 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
             "./img/2aOboQx0hUQyehZkV6vmaLMTwEp6vV4YWV8dwk7s.jpg",
             "./img/2aOboQx0hUSVWkIX8D1EVTizUJMPCChURugMrfxQ.jpg",
             "./img/2aOboQx0hUf1WqfShRqAn0d625BJNL9R3y55ELrM.jpg",
-            "./img/2aOboQx0hfFEsktgDKJE8OCa3UIzhENPCB8DnUpc.jpg"
+            "./img/2aOboQx0hfFEsktgDKJE8OCa3UIzhENPCB8DnUpc.jpg",
+            "./img/2aOboQx0zZCwowmq2oUBT52O5r0kMQwZYfnaf8uu.jpg",
+            "./img/2aOboQx0zi9okYrsPLHnNpFb0puNg0C24wNz9asq.jpg",
+            "./img/2aOboQx0zk2aBl42NISJYvb8BnKRTInu73RDH1ea.jpg",
+            "./img/2aOboQx121P1xPGKVFVcw4Mf8l5zaMQPhrVEXzou.jpg",
+            "./img/2aOboQx122bvnum0Oe4JPWTHyBpbGFjgTkzIpDzU.jpg",
+            "./img/2aOboQx122k0vAk65Q7fIxUI1Hsx2WSn9aI0DpYW.jpg",
+            "./img/2aOboQx122thm7JjPi0qoDCup1foND4IPRD1d9gu.jpg",
+            "./img/2aOboQx12MyeOiE8gJaNZDvgIAm5z3l3G9Q0QDVQ.jpg",
+            "./img/2aOboQx1Bsc90nj7hyZXrMWsnSUsF93dsMqxwLmi.jpg",
+            "./img/2aOboQx1BscBRcfVDBRjhhSiYQ9kKlv2ZIXazSM4.jpg",
+            "./img/2aOboQx1C0GcWsTPi2Rj7Syg9C6lZUYLZezKQb0S.jpg",
+            "./img/2aOboQx1C0Hidsq1nqv4ku912Cwm0CWUKMyEOZYO.jpg",
+            "./img/2aOboQx1C0IyUAy9uUtBlgpis0WkdBLQ6okTOLFw.jpg",
+            "./img/2aOboQx1C0N5uRpxlIfFP58GfK5DzFM53AxzT9Hs.jpg",
+            "./img/2aOboQx1C0OtoF9Ouqs2EaOdJFonwPcjBayuRDXc.jpg",
+            "./img/2aOboQx1C0OtoF9Ouqs2EaRiRDFgCqaHdI6zNWwS.jpg",
+            "./img/2aOboQx1C0Qk8rPDZbx0uQdL8lbrHfkolSl96bA0.jpg",
+            "./img/2aOboQx1C0Qk8rPDZbx0uQeL1NmwpIbEqNlApLRw.jpg",
+            "./img/2aOboQx1C0Qk8rPDZbx0uQjBE7ZwiMW36dalTRom.jpg",
+            "./img/2aOboQx1C0QmZgLb4opCklVy6p2ooJWYexjDRhgG.jpg",
+            "./img/2aOboQx1C0QmZgLb4opCklWNBfquOSAdgemgHWYi.jpg",
+            "./img/2aOboQx1C0QmZgLb4opCklYWGUVDGXLpEIhyNvzk.jpg",
+            "./img/2aOboQx1C0lIpOnrKPx7F37T17ALunpvOX6pqdQ8.jpg",
+            "./img/2aOboQx1C0lIpOnrKPx7F37WS2JPWKgdDznPMmiO.jpg",
+            "./img/2aOboQx1C0lIpOnrKPx7F3BjqEi5P8YX8hpF6T1k.jpg",
+            "./img/2aOboQx1C0lUzVVkqSK4SjefK16lr6PIvZW5hPYe.jpg",
+            "./img/2aOboQx1C0lvkXrvNjwAkRUcbzkm36Q3tsxI5RKa.jpg",
+            "./img/2aOboQx1C0lvkXrvNjwAkRVS6D7pTDLzIOCOi4Lw.jpg",
+            "./img/2aOboQx1C0lvkXrvNjwAkRWxazhhuNsFr7A5KI4G.jpg",
+            "./img/2aOboQx1C0lvkXrvNjwAkRctQYlZYzEYxagZ1PDE.jpg",
+            "./img/2aOboQx1C0mTo33EQeAqZA24kKEuHRye2GyoT3gG.jpg",
+            "./img/2aOboQx1C0mTo33EQeAqZA6SFcNphmikXSPadS0e.jpg",
+            "./img/2aOboQx1C0mphRWdxW2ZAC71MrxQhb4loBXrP0vA.jpg",
+            "./img/2aOboQx1C0mphRWdxW2ZAC9oq22h5iD4Z8RCqDR2.jpg",
+            "./img/2aOboQx1C0mphRWdxW2ZACBsNW9l0ZKbmy7WrJY0.jpg",
+            "./img/2aOboQx1C1MLD1fiUR3S7EkxiozhBf2J9FWiBdqa.jpg",
+            "./img/2aOboQx1C1MLD1fiUR3S7EmW6iVTOoF2NGzl40YK.jpg",
+            "./img/2aOboQx1C1MQ4fYTUqnpnuZho7Vk6datmuH3ILHE.jpg",
+            "./img/2aOboQx1C1Nb3Jnqb51Z81Wov8IT7I3Ta9N7I8dk.jpg",
+            "./img/2aOboQx1C1YJ9crL0ldia2fcLQ0iFPDKEwsOJ4ka.jpg",
+            "./img/2aOboQx1C1YJ9crL0ldia2iop0OouMUqN8v79e3U.jpg"
         ];
         const NODE_COUNT  = 5000;         // interactive heart nodes
         const HALO_COUNT  = 1800;         // glowing aura particles
@@ -891,8 +952,12 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
             }
         }
 
+        function isVideoUrl(url) {
+            return /\.(mp4|mov|webm|m4v)$/i.test(url);
+        }
+
         PHOTO_FILES.forEach((url, i) => {
-            const thumbUrl = url.replace('./img/', './img_thumbs/');
+            const thumbUrl = url.replace('./img/', './img_thumbs/').replace(/\.(mp4|mov|webm|m4v)$/i, '.jpg');
             const applyTex = (t) => {
                 t.colorSpace = THREE.SRGBColorSpace;
                 autoScaleTextureCover(t);
@@ -910,8 +975,10 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
                 applyTex,
                 undefined,
                 () => {
-                    // Fallback to original image
-                    photoLoader.load(url, applyTex, undefined, (err) => console.warn('Could not load', url, err));
+                    // Fallback to original image if not video
+                    if (!isVideoUrl(url)) {
+                        photoLoader.load(url, applyTex, undefined, (err) => console.warn('Could not load', url, err));
+                    }
                 }
             );
         });
@@ -1096,12 +1163,12 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
             ctx.strokeStyle = primaryColor + '88';
             ctx.stroke();
 
-            // 6. Polaroid chin bottom emblem
+            // 6. Polaroid chin bottom emblem (prominent green heart)
             ctx.fillStyle = primaryColor;
-            ctx.font = 'bold 22px system-ui, sans-serif';
+            ctx.font = 'bold 60px system-ui, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('♥', W / 2, H - 42);
+            ctx.fillText('♥', W / 2, H - 56);
 
             const tex = new THREE.CanvasTexture(c);
             tex.colorSpace = THREE.SRGBColorSpace;
@@ -1196,6 +1263,31 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
         let cardFrameTexture = createCardFrameTexture(currentTheme.primary);
         let cardBackTexture = createCardBackTexture(currentTheme.primary);
 
+        function createPlayBadgeTexture() {
+            const c = document.createElement('canvas');
+            c.width = 128;
+            c.height = 128;
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
+            ctx.beginPath();
+            ctx.arc(64, 64, 52, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.92)';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.moveTo(53, 42);
+            ctx.lineTo(83, 64);
+            ctx.lineTo(53, 86);
+            ctx.closePath();
+            ctx.fill();
+            const tex = new THREE.CanvasTexture(c);
+            tex.colorSpace = THREE.SRGBColorSpace;
+            return tex;
+        }
+        let playBadgeTexture = null;
+
         // Choose 24 distributed anchor node indices from the heart nodes
         const cardAnchorStep = Math.floor(NODE_COUNT / CARD_COUNT);
         for (let k = 0; k < CARD_COUNT; k++) {
@@ -1229,6 +1321,20 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
             const photoMesh = new THREE.Mesh(photoGeom, photoMat);
             photoMesh.position.set(0, 0.32, 0.02);
             frontGroup.add(photoMesh);
+
+            // Video indicator play badge
+            if (isVideoUrl(PHOTO_FILES[photoIndex])) {
+                if (!playBadgeTexture) playBadgeTexture = createPlayBadgeTexture();
+                const badgeMat = new THREE.MeshBasicMaterial({
+                    map: playBadgeTexture,
+                    transparent: true,
+                    side: THREE.FrontSide,
+                });
+                const badgeGeom = new THREE.PlaneGeometry(0.72, 0.72);
+                const badgeMesh = new THREE.Mesh(badgeGeom, badgeMat);
+                badgeMesh.position.set(0, 0.32, 0.035);
+                frontGroup.add(badgeMesh);
+            }
 
             cardGroupMesh.add(frontGroup);
 
@@ -1758,11 +1864,13 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
         // ============================================================
         const lb          = document.getElementById('lightbox');
         const lbCanvas    = document.getElementById('lightbox-canvas');
+        const lbVideo     = document.getElementById('lightbox-video');
         const lbCtx       = lbCanvas.getContext('2d');
         const lbCaption   = document.getElementById('lb-caption');
         const lbCloseBtn  = document.getElementById('lb-close');
         const lbPrevBtn   = document.getElementById('lb-prev');
         const lbNextBtn   = document.getElementById('lb-next');
+        const lbHint      = document.querySelector('.lb-hint');
 
         const lbState = {
             index: 0,
@@ -1828,24 +1936,47 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
             if (PHOTO_FILES.length === 0) return;
             idx = ((idx % PHOTO_FILES.length) + PHOTO_FILES.length) % PHOTO_FILES.length;
             lbState.index = idx;
-            lbCaption.textContent = `${idx + 1} / ${PHOTO_FILES.length}`;
+            const fileUrl = PHOTO_FILES[idx];
+            const isVideo = isVideoUrl(fileUrl);
 
-            // Show thumbnail immediately if ready
-            const tex = photoTextures[idx];
-            if (tex && tex.image) {
-                lbState.image = tex.image;
-                fitImageToCanvas();
-            }
+            if (isVideo) {
+                // Video mode: hide canvas, show video player
+                lbCanvas.style.display = 'none';
+                lbVideo.style.display = 'block';
+                lbCaption.textContent = `${idx + 1} / ${PHOTO_FILES.length} (Video)`;
+                if (lbHint) lbHint.textContent = "Space: play/pause · Esc / ✕: close · ‹ / ›: next/prev";
+                lbState.image = null;
+                lbVideo.src = fileUrl;
+                lbVideo.currentTime = 0;
+                lbVideo.play().catch(() => {});
+            } else {
+                // Image mode: pause & hide video, show canvas
+                if (lbVideo) {
+                    lbVideo.pause();
+                    lbVideo.src = '';
+                    lbVideo.style.display = 'none';
+                }
+                lbCanvas.style.display = 'block';
+                lbCaption.textContent = `${idx + 1} / ${PHOTO_FILES.length}`;
+                if (lbHint) lbHint.textContent = "Wheel: zoom · Drag: pan · Esc / ✕: close";
 
-            // Load original high-resolution image in background for lightbox
-            const fullImg = new Image();
-            fullImg.onload = () => {
-                if (lbState.index === idx) {
-                    lbState.image = fullImg;
+                // Show thumbnail immediately if ready
+                const tex = photoTextures[idx];
+                if (tex && tex.image) {
+                    lbState.image = tex.image;
                     fitImageToCanvas();
                 }
-            };
-            fullImg.src = PHOTO_FILES[idx];
+
+                // Load original high-resolution image in background for lightbox
+                const fullImg = new Image();
+                fullImg.onload = () => {
+                    if (lbState.index === idx) {
+                        lbState.image = fullImg;
+                        fitImageToCanvas();
+                    }
+                };
+                fullImg.src = fileUrl;
+            }
         }
 
         function openLightbox(idx) {
@@ -1856,6 +1987,10 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
         function closeLightbox() {
             lb.classList.remove('open');
             lb.setAttribute('aria-hidden', 'true');
+            if (lbVideo) {
+                lbVideo.pause();
+                lbVideo.src = '';
+            }
         }
 
         lbCloseBtn.addEventListener('click', closeLightbox);
@@ -1872,6 +2007,10 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
                 if (e.key === 'Escape')     closeLightbox();
                 if (e.key === 'ArrowLeft')  loadLightboxImage(lbState.index - 1);
                 if (e.key === 'ArrowRight') loadLightboxImage(lbState.index + 1);
+                if (e.key === ' ' && lbVideo && lbVideo.style.display === 'block') {
+                    e.preventDefault();
+                    if (lbVideo.paused) lbVideo.play(); else lbVideo.pause();
+                }
                 return;
             }
             if (letterModal.classList.contains('open')) {
@@ -2146,6 +2285,7 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
             setTargetLevel,
             handleScrollStep,
             setTheme,
+            rotateGallery: (rad) => { targetGalleryAngle = galleryAngle = rad; },
         };
     </script>
 </body>
