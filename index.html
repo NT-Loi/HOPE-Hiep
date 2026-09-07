@@ -390,12 +390,13 @@
         #lightbox.open { display: flex; opacity: 1; }
 
         #lightbox-canvas {
-            max-width: 92vw;
-            max-height: 82vh;
+            max-width: 95vw;
+            max-height: 88vh;
+            display: block;
             cursor: grab;
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
             border-radius: 8px;
-            background: #ffffff;
+            background: #000000;
         }
         #lightbox-canvas.dragging { cursor: grabbing; }
 
@@ -574,7 +575,7 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
         const THEMES = {
             rose: {
                 id: 'rose',
-                name: 'Rose Studio',
+                name: 'Rose',
                 icon: '💖',
                 title: 'Natural Heart Nodes',
                 bg0: '#f4f5f8',
@@ -593,7 +594,7 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
             },
             emerald: {
                 id: 'emerald',
-                name: 'Emerald Studio',
+                name: 'Emerald',
                 icon: '🌿',
                 title: 'Green Heart Nodes',
                 bg0: '#f2f8f3',
@@ -617,7 +618,298 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
         // ============================================================
         // CONFIG
         // ============================================================
-        const PHOTO_FILES = ['./img/a1.jpg', './img/a2.jpg', './img/a3.jpg', './img/a4.jpg'];
+        const PHOTO_FILES = [
+            "./img/IMG_1188.JPG",
+            "./img/IMG_1193.JPG",
+            "./img/IMG_1196.JPG",
+            "./img/IMG_1197.JPG",
+            "./img/IMG_1198.JPG",
+            "./img/IMG_1199.JPG",
+            "./img/IMG_1200.JPG",
+            "./img/IMG_1201.JPG",
+            "./img/IMG_1206.JPG",
+            "./img/IMG_1207.JPG",
+            "./img/IMG_1208.JPG",
+            "./img/IMG_1210.JPG",
+            "./img/IMG_1211.JPG",
+            "./img/IMG_1212.JPG",
+            "./img/IMG_1214.JPG",
+            "./img/IMG_1215.JPG",
+            "./img/IMG_1216.JPG",
+            "./img/IMG_1217.JPG",
+            "./img/IMG_1218.JPG",
+            "./img/IMG_1219.JPG",
+            "./img/IMG_1220.JPG",
+            "./img/IMG_1221.JPG",
+            "./img/IMG_1222.JPG",
+            "./img/IMG_1225.JPG",
+            "./img/IMG_1226.JPG",
+            "./img/IMG_1227.JPG",
+            "./img/IMG_1228.JPG",
+            "./img/IMG_1229.JPG",
+            "./img/IMG_1230.JPG",
+            "./img/IMG_1231.JPG",
+            "./img/IMG_1232.JPG",
+            "./img/IMG_1236.JPG",
+            "./img/IMG_1238.JPG",
+            "./img/IMG_1239.JPG",
+            "./img/IMG_1240.JPG",
+            "./img/IMG_1241.JPG",
+            "./img/IMG_1242.JPG",
+            "./img/IMG_1243.JPG",
+            "./img/IMG_1244.JPG",
+            "./img/IMG_1245.JPG",
+            "./img/IMG_1246.JPG",
+            "./img/IMG_1247.JPG",
+            "./img/IMG_1248.JPG",
+            "./img/IMG_1249.JPG",
+            "./img/IMG_1250.JPG",
+            "./img/IMG_1251.JPG",
+            "./img/IMG_1252.JPG",
+            "./img/IMG_1253.JPG",
+            "./img/IMG_1254.JPG",
+            "./img/IMG_1255.JPG",
+            "./img/IMG_1256.JPG",
+            "./img/IMG_1257.JPG",
+            "./img/IMG_1258.JPG",
+            "./img/IMG_1259.JPG",
+            "./img/IMG_1260.JPG",
+            "./img/IMG_1261.JPG",
+            "./img/IMG_1262.JPG",
+            "./img/IMG_1263.JPG",
+            "./img/IMG_1264.JPG",
+            "./img/IMG_1265.JPG",
+            "./img/IMG_1266.JPG",
+            "./img/IMG_1267.JPG",
+            "./img/IMG_1268.JPG",
+            "./img/IMG_1269.JPG",
+            "./img/IMG_1270.JPG",
+            "./img/IMG_1271.JPG",
+            "./img/IMG_1272.JPG",
+            "./img/IMG_1273.JPG",
+            "./img/IMG_1274.JPG",
+            "./img/IMG_1275.JPG",
+            "./img/IMG_1276.JPG",
+            "./img/IMG_1277.JPG",
+            "./img/IMG_1278.JPG",
+            "./img/IMG_1279.JPG",
+            "./img/IMG_1280.JPG",
+            "./img/IMG_1281.JPG",
+            "./img/IMG_1282.JPG",
+            "./img/IMG_1283.JPG",
+            "./img/IMG_1284.JPG",
+            "./img/IMG_1285.JPG",
+            "./img/IMG_1286.JPG",
+            "./img/IMG_1287.JPG",
+            "./img/IMG_1288.JPG",
+            "./img/IMG_1289.JPG",
+            "./img/IMG_1290.JPG",
+            "./img/IMG_1291.JPG",
+            "./img/IMG_1292.JPG",
+            "./img/IMG_1293.JPG",
+            "./img/IMG_1294.JPG",
+            "./img/IMG_1295.JPG",
+            "./img/IMG_1296.JPG",
+            "./img/IMG_1297.JPG",
+            "./img/IMG_1298.JPG",
+            "./img/IMG_1299.JPG",
+            "./img/IMG_1300.JPG",
+            "./img/IMG_1301.JPG",
+            "./img/IMG_1302.JPG",
+            "./img/IMG_1303.JPG",
+            "./img/IMG_1304.JPG",
+            "./img/IMG_1305.JPG",
+            "./img/IMG_1306.JPG",
+            "./img/IMG_1307.JPG",
+            "./img/IMG_1308.JPG",
+            "./img/IMG_1309.JPG",
+            "./img/IMG_1310.JPG",
+            "./img/IMG_1311.JPG",
+            "./img/IMG_1312.JPG",
+            "./img/IMG_1313.JPG",
+            "./img/IMG_1314.JPG",
+            "./img/IMG_1315.JPG",
+            "./img/IMG_1316.JPG",
+            "./img/IMG_1317.JPG",
+            "./img/IMG_1318.JPG",
+            "./img/IMG_1319.JPG",
+            "./img/IMG_1320.JPG",
+            "./img/IMG_1321.JPG",
+            "./img/IMG_1322.JPG",
+            "./img/IMG_1323.JPG",
+            "./img/IMG_1324.JPG",
+            "./img/IMG_1325.JPG",
+            "./img/IMG_1326.JPG",
+            "./img/IMG_1327.JPG",
+            "./img/IMG_1328.JPG",
+            "./img/IMG_1329.JPG",
+            "./img/IMG_1330.JPG",
+            "./img/IMG_1331.JPG",
+            "./img/IMG_1332.JPG",
+            "./img/IMG_1333.JPG",
+            "./img/IMG_1334.JPG",
+            "./img/IMG_1335.JPG",
+            "./img/IMG_1336.JPG",
+            "./img/IMG_1337.JPG",
+            "./img/IMG_1338.JPG",
+            "./img/IMG_1339.JPG",
+            "./img/IMG_1340.JPG",
+            "./img/IMG_1341.JPG",
+            "./img/IMG_1342.JPG",
+            "./img/IMG_1343.JPG",
+            "./img/IMG_1344.JPG",
+            "./img/IMG_1346.JPG",
+            "./img/IMG_1347.JPG",
+            "./img/IMG_1348.JPG",
+            "./img/IMG_1349.JPG",
+            "./img/IMG_1350.JPG",
+            "./img/IMG_1351.JPG",
+            "./img/IMG_1353.JPG",
+            "./img/IMG_1354.JPG",
+            "./img/IMG_1355.JPG",
+            "./img/IMG_1356.JPG",
+            "./img/IMG_1366.JPG",
+            "./img/IMG_1367.JPG",
+            "./img/IMG_1368.JPG",
+            "./img/IMG_1369.JPG",
+            "./img/IMG_1370.JPG",
+            "./img/IMG_1371.JPG",
+            "./img/IMG_1372.JPG",
+            "./img/IMG_1373.JPG",
+            "./img/IMG_1374.JPG",
+            "./img/IMG_1375.JPG",
+            "./img/IMG_1376.JPG",
+            "./img/IMG_1377.JPG",
+            "./img/IMG_1378.JPG",
+            "./img/IMG_1379.JPG",
+            "./img/IMG_1380.JPG",
+            "./img/IMG_1381.JPG",
+            "./img/IMG_1382.JPG",
+            "./img/IMG_1383.JPG",
+            "./img/IMG_1384.JPG",
+            "./img/IMG_1385.JPG",
+            "./img/IMG_1386.JPG",
+            "./img/IMG_1387.JPG",
+            "./img/IMG_1388.JPG",
+            "./img/IMG_1391.JPG",
+            "./img/IMG_1392.JPG",
+            "./img/IMG_1393.JPG",
+            "./img/IMG_1394.JPG",
+            "./img/IMG_1395.JPG",
+            "./img/IMG_1396.JPG",
+            "./img/IMG_1397.JPG",
+            "./img/IMG_1398.JPG",
+            "./img/IMG_1399.JPG",
+            "./img/IMG_1400.JPG",
+            "./img/IMG_1401.JPG",
+            "./img/IMG_1402.JPG",
+            "./img/IMG_1403.JPG",
+            "./img/IMG_1404.JPG",
+            "./img/IMG_1406.JPG",
+            "./img/IMG_1407.JPG",
+            "./img/IMG_1408.JPG",
+            "./img/IMG_1409.JPG",
+            "./img/IMG_1410.JPG",
+            "./img/IMG_1411.JPG",
+            "./img/IMG_1412.JPG",
+            "./img/IMG_1413.JPG",
+            "./img/IMG_1414.JPG",
+            "./img/IMG_1415.JPG",
+            "./img/IMG_1416.JPG",
+            "./img/IMG_1417.JPG",
+            "./img/IMG_1418.JPG",
+            "./img/IMG_1419.JPG",
+            "./img/IMG_1420.JPG",
+            "./img/IMG_1421.JPG",
+            "./img/IMG_1422.JPG",
+            "./img/IMG_1423.JPG",
+            "./img/IMG_1424.JPG",
+            "./img/IMG_1425.JPG",
+            "./img/IMG_1426.JPG",
+            "./img/IMG_1427.JPG",
+            "./img/IMG_1428.JPG",
+            "./img/IMG_1429.JPG",
+            "./img/IMG_1430.JPG",
+            "./img/IMG_1431.JPG",
+            "./img/IMG_1433.JPG",
+            "./img/IMG_1434.JPG",
+            "./img/IMG_1435.JPG",
+            "./img/IMG_1436.JPG",
+            "./img/IMG_1437.JPG",
+            "./img/IMG_1438.JPG",
+            "./img/IMG_1439.JPG",
+            "./img/IMG_1440.JPG",
+            "./img/IMG_1441.JPG",
+            "./img/IMG_1442.JPG",
+            "./img/IMG_1443.JPG",
+            "./img/IMG_1444.JPG",
+            "./img/IMG_1445.JPG",
+            "./img/IMG_1447.JPG",
+            "./img/IMG_1448.JPG",
+            "./img/IMG_1449.JPG",
+            "./img/IMG_1450.JPG",
+            "./img/IMG_1451.JPG",
+            "./img/IMG_1453.JPG",
+            "./img/IMG_1454.JPG",
+            "./img/IMG_1455.JPG",
+            "./img/IMG_1456.JPG",
+            "./img/IMG_1457.JPG",
+            "./img/IMG_1458.JPG",
+            "./img/IMG_1459.JPG",
+            "./img/IMG_1460.JPG",
+            "./img/IMG_1461.JPG",
+            "./img/IMG_1462.JPG",
+            "./img/IMG_1463.JPG",
+            "./img/IMG_1464.JPG",
+            "./img/IMG_1465.JPG",
+            "./img/IMG_1466.JPG",
+            "./img/IMG_1467.JPG",
+            "./img/IMG_1468.JPG",
+            "./img/IMG_1469.JPG",
+            "./img/IMG_1471.JPG",
+            "./img/IMG_1472.JPG",
+            "./img/IMG_1473.JPG",
+            "./img/IMG_1474.JPG",
+            "./img/IMG_1475.JPG",
+            "./img/IMG_1476.JPG",
+            "./img/IMG_1478.JPG",
+            "./img/IMG_1479.JPG",
+            "./img/IMG_1480.JPG",
+            "./img/IMG_1482.JPG",
+            "./img/IMG_1483.JPG",
+            "./img/IMG_1487.JPG",
+            "./img/IMG_1488.JPG",
+            "./img/IMG_1490.JPG",
+            "./img/IMG_1491.JPG",
+            "./img/IMG_1492.JPG",
+            "./img/IMG_1493.JPG",
+            "./img/IMG_1494.JPG",
+            "./img/IMG_1495.JPG",
+            "./img/IMG_1496.JPG",
+            "./img/IMG_1497.JPG",
+            "./img/IMG_1498.JPG",
+            "./img/IMG_1501.JPG",
+            "./img/IMG_1502.JPG",
+            "./img/IMG_1503.JPG",
+            "./img/IMG_1504.JPG",
+            "./img/IMG_1505.JPG",
+            "./img/IMG_1506.JPG",
+            "./img/IMG_1507.JPG",
+            "./img/IMG_1508.JPG",
+            "./img/IMG_1509.JPG",
+            "./img/IMG_1510.JPG",
+            "./img/IMG_1511.JPG",
+            "./img/IMG_1512.JPG",
+            "./img/IMG_1513.JPG",
+            "./img/IMG_1516.JPG",
+            "./img/IMG_1519.JPG",
+            "./img/IMG_1527.JPG",
+            "./img/IMG_1528.JPG",
+            "./img/IMG_1533.JPG",
+            "./img/IMG_1537.JPG",
+            "./img/IMG_1541.JPG",
+            "./img/IMG_1560.JPG"
+        ];
         const NODE_COUNT  = 5000;         // interactive heart nodes
         const HALO_COUNT  = 1800;         // glowing aura particles
         const DUST_COUNT  = 180;          // gentle falling sparkles
@@ -642,7 +934,7 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(
-            52, window.innerWidth / window.innerHeight, 0.1, 250
+            52, window.innerWidth / window.innerHeight, 0.1, 1500
         );
         camera.position.set(0, 0, 32);
 
@@ -810,17 +1102,26 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
         const photoLoader = new THREE.TextureLoader();
         const photoTextures = [];
         PHOTO_FILES.forEach((url, i) => {
-            photoLoader.load(
-                url,
-                (t) => {
-                    t.colorSpace = THREE.SRGBColorSpace;
-                    photoTextures[i] = t;
-                    if (i === PHOTO_FILES.length - 1) {
-                        applyCardTextures();
+            const thumbUrl = url.replace('./img/', './img_thumbs/');
+            const applyTex = (t) => {
+                t.colorSpace = THREE.SRGBColorSpace;
+                photoTextures[i] = t;
+                imageCards.forEach(c => {
+                    if (c.photoIndex === i) {
+                        c.photoMat.map = t;
+                        c.photoMat.needsUpdate = true;
                     }
-                },
+                });
+            };
+
+            photoLoader.load(
+                thumbUrl,
+                applyTex,
                 undefined,
-                (err) => console.warn('Could not load', url, err)
+                () => {
+                    // Fallback to original image
+                    photoLoader.load(url, applyTex, undefined, (err) => console.warn('Could not load', url, err));
+                }
             );
         });
 
@@ -947,7 +1248,7 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
         // IMAGE CARDS SYSTEM (Level 2 Floating & Level 3 Horizontal Line)
         // 24 framed memory cards with glowing border and light node pin
         // ============================================================
-        const CARD_COUNT = 24;
+        const CARD_COUNT = PHOTO_FILES.length;
         const imageCards = [];
         const cardGroup = new THREE.Group();
         scene.add(cardGroup);
@@ -1152,31 +1453,22 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
             backMesh.position.z = -0.01;
             cardGroupMesh.add(backMesh);
 
-            // Light node pin on top of the frame
-            const pinMat = new THREE.SpriteMaterial({
-                map: nodeTexture,
-                color: new THREE.Color(currentTheme.primary),
-                transparent: true,
-                blending: THREE.NormalBlending,
-            });
-            const pinSprite = new THREE.Sprite(pinMat);
-            pinSprite.scale.set(NODE_BASE_SIZE * 2.1, NODE_BASE_SIZE * 2.1, 1);
-            pinSprite.position.set(0, 1.68, 0.04);
-            cardGroupMesh.add(pinSprite);
-
             // Level 1 position (at the heart node)
             const posLevel1 = anchorNode.posHeart.clone();
 
-            // Level 2 position: clustered memories around the heart area
+            // Level 2 position: widely scattered memories across heart volume and atmosphere
             const tAngle = (k / CARD_COUNT) * Math.PI * 2;
             const hx = 16 * Math.pow(Math.sin(tAngle), 3);
             const hy = 13 * Math.cos(tAngle) - 5 * Math.cos(2*tAngle) - 2 * Math.cos(3*tAngle) - Math.cos(4*tAngle);
             const scaleFac = HEART_SCALE / 17;
-            const spreadRad = 1.4 + (k % 3) * 0.2;
+            const spreadRad = 1.0 + ((k * 37) % 100) / 100 * 2.4; // 1.0 to 3.4 radial spread
+            const jitterX = ((k * 19) % 17 - 8) * 0.55;
+            const jitterY = ((k * 23) % 17 - 8) * 0.55;
+            const jitterZ = ((k * 29) % 19 - 9) * 0.85; // generous -7.6 to +7.6 depth
             const posLevel2 = new THREE.Vector3(
-                hx * scaleFac * spreadRad + ((k * 7) % 5 - 2) * 0.8,
-                (hy - CY) * scaleFac * spreadRad + ((k * 11) % 5 - 2) * 0.8,
-                ((k % 7) - 3) * 1.5
+                hx * scaleFac * spreadRad + jitterX,
+                (hy - CY) * scaleFac * spreadRad + jitterY,
+                jitterZ
             );
 
             cardGroupMesh.position.copy(posLevel1);
@@ -1191,7 +1483,6 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
                 photoMat,
                 backMesh,
                 backMat,
-                pinSprite,
                 photoIndex,
                 anchorNode,
                 posLevel1,
@@ -1214,6 +1505,7 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
             imageCards.push(cardObj);
             cardGroup.add(cardGroupMesh);
         }
+        const cardMeshes = imageCards.map(c => c.mesh);
 
         function applyCardTextures() {
             cardFrameTexture = createCardFrameTexture(currentTheme.primary);
@@ -1227,20 +1519,21 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
                 c.frameMat.needsUpdate = true;
                 c.backMat.map = cardBackTexture;
                 c.backMat.needsUpdate = true;
-                if (c.pinSprite) {
-                    c.pinSprite.material.map = nodeTexture;
-                    c.pinSprite.material.color.set(currentTheme.primary);
-                }
             });
         }
 
         // ============================================================
         // LEVEL 3: 3D CIRCULAR CAROUSEL SETUP
         // ============================================================
-        const CIRCLE_RADIUS = 15.5;
+        // LEVEL 3: 3D CIRCULAR CAROUSEL SETUP
+        // ============================================================
+        // Auto-resize circle radius to fit any number of cards with comfortable spacing (no overlay)
+        const CARD_SPACING = 5.5;
+        const CIRCLE_RADIUS = Math.max(15.5, (CARD_COUNT * CARD_SPACING) / (Math.PI * 2));
+        const CIRCLE_CENTER_Z = 15.5 - CIRCLE_RADIUS;
 
         // Invisible hit ring attached to cardGroup for testing if mouse drags on the cards circle
-        const hitRingGeom = new THREE.RingGeometry(CIRCLE_RADIUS - 3.5, CIRCLE_RADIUS + 3.5, 64);
+        const hitRingGeom = new THREE.RingGeometry(CIRCLE_RADIUS - 4.5, CIRCLE_RADIUS + 4.5, 128);
         hitRingGeom.rotateX(-Math.PI / 2);
         const cardsHitRing = new THREE.Mesh(
             hitRingGeom,
@@ -1251,6 +1544,7 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
                 side: THREE.DoubleSide
             })
         );
+        cardsHitRing.position.set(0, 0, CIRCLE_CENTER_Z);
         cardGroup.add(cardsHitRing);
 
         // ============================================================
@@ -1273,12 +1567,12 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
         } else if (levelProgress >= 1.5) {
             camera.position.set(0, 5.8, 29.5);
         } else if (levelProgress >= 0.5) {
-            camera.position.z = 22;
+            camera.position.z = 32;
         }
         if (levelProgress >= 0.5 && levelProgress < 2.5) {
             imageCards.forEach(c => {
-                c.currentScale = c.targetScale = 1.0;
-                c.mesh.scale.set(1, 1, 1);
+                c.currentScale = c.targetScale = (levelProgress > 1.5 ? 1.65 : 0.85);
+                c.mesh.scale.set(c.currentScale, c.currentScale, 1);
             });
         }
 
@@ -1360,7 +1654,7 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
 
             // In Level 3 (3D Circular Carousel): Horizontal trackpad swipe spins the carousel
             if (currentLevel === 2 && Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.2 && Math.abs(e.deltaX) > 8) {
-                targetGalleryAngle -= e.deltaX * 0.0035;
+                targetGalleryAngle -= e.deltaX * (0.054 / CIRCLE_RADIUS);
                 return;
             }
 
@@ -1443,7 +1737,7 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
 
         function isPointerOnCardsCircle(ndc) {
             raycaster.setFromCamera(ndc, camera);
-            const cardHits = raycaster.intersectObjects(imageCards.map(c => c.mesh), true);
+            const cardHits = raycaster.intersectObjects(cardMeshes, true);
             if (cardHits.length > 0) return true;
             const ringHits = raycaster.intersectObject(cardsHitRing, false);
             return ringHits.length > 0;
@@ -1493,7 +1787,7 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
 
             // In Level 3: Only move the cards circle horizontal if mouse drag is on the cards circle position!
             if (levelProgress > 1.4 && levelProgress < 2.6 && dragMode === 'cardsCircle') {
-                const spinSens = 0.0055;
+                const spinSens = 0.085 / CIRCLE_RADIUS;
                 targetGalleryAngle += dx * spinSens;
                 galleryAngleVelocity = dx * spinSens * 0.45;
             } else {
@@ -1525,14 +1819,7 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
         canvas.addEventListener('click', () => {
             // If user clicked (not dragged) on an image card in Level 2 or Level 3
             if (!dragMoved && hoveredCard) {
-                // Toggle flip: tap to flip, tap front again to open lightbox
-                hoveredCard.flipped = !hoveredCard.flipped;
-                hoveredCard.targetFlipAngle = hoveredCard.flipped ? Math.PI : 0;
-
-                // If card was flipped back to front, open lightbox
-                if (!hoveredCard.flipped) {
-                    openLightbox(hoveredCard.photoIndex);
-                }
+                openLightbox(hoveredCard.photoIndex);
             }
         });
 
@@ -1542,8 +1829,7 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
                 return null;
             }
             raycaster.setFromCamera(pointerNdc, camera);
-            const meshes = imageCards.map(c => c.mesh);
-            const hits = raycaster.intersectObjects(meshes, true);
+            const hits = raycaster.intersectObjects(cardMeshes, true);
             if (!hits.length) return null;
             let obj = hits[0].object;
             while (obj && !obj.userData.cardObj) {
@@ -1557,7 +1843,7 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
         function updateCamera(dt) {
             // Base camera position by level:
             // Level 1 = (0, 0, 32)
-            // Level 2 = (0, 0, 22) (~70% zoom)
+            // Level 2 = (0, 0, 28) (subtle gentle zoom)
             // Level 3 = (0, 5.8, 29.5) (Elevated perspective tilted down at 3D circle carousel!)
             // Level 4 = (0, 0, 30)
             let targetX = 0;
@@ -1565,16 +1851,16 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
             let targetZ = 32;
 
             if (levelProgress <= 1.0) {
-                targetZ = THREE.MathUtils.lerp(32, 22, levelProgress);
+                targetZ = THREE.MathUtils.lerp(32, 32, levelProgress);
                 targetY = 0;
             } else if (levelProgress <= 2.0) {
                 const frac = THREE.MathUtils.smoothstep(levelProgress, 1.0, 2.0);
                 targetY = THREE.MathUtils.lerp(0, 5.8, frac);
-                targetZ = THREE.MathUtils.lerp(22, 29.5, frac);
+                targetZ = THREE.MathUtils.lerp(32, 30, frac);
             } else {
                 const frac = THREE.MathUtils.smoothstep(levelProgress, 2.0, 3.0);
                 targetY = THREE.MathUtils.lerp(5.8, 0, frac);
-                targetZ = THREE.MathUtils.lerp(29.5, 30, frac);
+                targetZ = THREE.MathUtils.lerp(30, 30, frac);
             }
 
             let parallaxX = 0;
@@ -1691,34 +1977,43 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
         const lbState = {
             index: 0,
             image: null,
-            scale: 1,
-            minScale: 1,
+            zoom: 1.0,
             offsetX: 0,
             offsetY: 0,
             dragging: false,
             dragStart: { x: 0, y: 0, ox: 0, oy: 0 },
         };
 
-        function syncLightboxCanvasSize() {
-            if (!lbState.image) return;
-            const cssW = lbCanvas.clientWidth;
-            const cssH = lbCanvas.clientHeight;
-            const dpr  = Math.min(window.devicePixelRatio, 2);
-            const targetW = Math.floor(cssW * dpr);
-            const targetH = Math.floor(cssH * dpr);
-            if (lbCanvas.width !== targetW)  lbCanvas.width  = targetW;
-            if (lbCanvas.height !== targetH) lbCanvas.height = targetH;
-        }
-
         function fitImageToCanvas() {
             if (!lbState.image) return;
-            syncLightboxCanvasSize();
-            const vw = lbCanvas.clientWidth;
-            const vh = lbCanvas.clientHeight;
-            const iw = lbState.image.width;
-            const ih = lbState.image.height;
-            lbState.scale = Math.min(vw / iw, vh / ih) * 0.92;
-            lbState.minScale = lbState.scale;
+            const img = lbState.image;
+            const iw = img.naturalWidth || img.videoWidth || img.width;
+            const ih = img.naturalHeight || img.videoHeight || img.height;
+            if (!iw || !ih) return;
+
+            // Expand canvas to fill available viewport space (up to 95vw, 87vh)
+            const availW = Math.max(320, window.innerWidth * 0.95);
+            const availH = Math.max(240, window.innerHeight * 0.87);
+            const aspect = iw / ih;
+
+            let cssW, cssH;
+            if (availW / availH > aspect) {
+                // Height constrained
+                cssH = availH;
+                cssW = cssH * aspect;
+            } else {
+                // Width constrained
+                cssW = availW;
+                cssH = cssW / aspect;
+            }
+
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            lbCanvas.style.width = `${Math.round(cssW)}px`;
+            lbCanvas.style.height = `${Math.round(cssH)}px`;
+            lbCanvas.width = Math.round(cssW * dpr);
+            lbCanvas.height = Math.round(cssH * dpr);
+
+            lbState.zoom = 1.0;
             lbState.offsetX = 0;
             lbState.offsetY = 0;
             drawLightbox();
@@ -1728,27 +2023,39 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
             if (!lbState.image) return;
             const w = lbCanvas.width;
             const h = lbCanvas.height;
-            lbCtx.fillStyle = '#ffffff';
-            lbCtx.fillRect(0, 0, w, h);
-            const iw = lbState.image.width  * lbState.scale;
-            const ih = lbState.image.height * lbState.scale;
-            const x = (w - iw) / 2 + lbState.offsetX;
-            const y = (h - ih) / 2 + lbState.offsetY;
-            lbCtx.drawImage(lbState.image, x, y, iw, ih);
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            lbCtx.clearRect(0, 0, w, h);
+
+            const zoom = lbState.zoom || 1.0;
+            const drawW = w * zoom;
+            const drawH = h * zoom;
+            const x = (w - drawW) / 2 + lbState.offsetX * dpr;
+            const y = (h - drawH) / 2 + lbState.offsetY * dpr;
+            lbCtx.drawImage(lbState.image, x, y, drawW, drawH);
         }
 
         function loadLightboxImage(idx) {
-            if (photoTextures.length === 0) return;
-            idx = ((idx % photoTextures.length) + photoTextures.length) % photoTextures.length;
+            if (PHOTO_FILES.length === 0) return;
+            idx = ((idx % PHOTO_FILES.length) + PHOTO_FILES.length) % PHOTO_FILES.length;
             lbState.index = idx;
+            lbCaption.textContent = `${idx + 1} / ${PHOTO_FILES.length}`;
+
+            // Show thumbnail immediately if ready
             const tex = photoTextures[idx];
-            if (!tex || !tex.image) {
-                setTimeout(() => loadLightboxImage(idx), 80);
-                return;
+            if (tex && tex.image) {
+                lbState.image = tex.image;
+                fitImageToCanvas();
             }
-            lbState.image = tex.image;
-            lbCaption.textContent = `${idx + 1} / ${photoTextures.length}`;
-            fitImageToCanvas();
+
+            // Load original high-resolution image in background for lightbox
+            const fullImg = new Image();
+            fullImg.onload = () => {
+                if (lbState.index === idx) {
+                    lbState.image = fullImg;
+                    fitImageToCanvas();
+                }
+            };
+            fullImg.src = PHOTO_FILES[idx];
         }
 
         function openLightbox(idx) {
@@ -1793,8 +2100,12 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
         lbCanvas.addEventListener('wheel', (e) => {
             if (!lb.classList.contains('open')) return;
             e.preventDefault();
-            const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
-            lbState.scale = Math.max(lbState.minScale * 0.9, Math.min(8, lbState.scale * factor));
+            const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+            lbState.zoom = Math.max(1.0, Math.min(8.0, (lbState.zoom || 1.0) * factor));
+            if (lbState.zoom === 1.0) {
+                lbState.offsetX = 0;
+                lbState.offsetY = 0;
+            }
             drawLightbox();
         }, { passive: false });
 
@@ -1916,10 +2227,10 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
                 const l1Pos = card.posLevel1;
                 const l2Pos = card.posLevel2;
 
-                // Level 3: 3D circular ring carousel
+                // Level 3: 3D circular ring carousel (auto-scaled without overlay)
                 const theta = (k / CARD_COUNT) * Math.PI * 2 + galleryAngle;
                 const circleX = Math.sin(theta) * CIRCLE_RADIUS;
-                const circleZ = Math.cos(theta) * CIRCLE_RADIUS;
+                const circleZ = CIRCLE_CENTER_Z + Math.cos(theta) * CIRCLE_RADIUS;
                 const circleY = Math.sin(elapsedTime * 2.0 + k * 0.45) * 0.09;
 
                 if (levelProgress <= 1.0) {
@@ -1928,21 +2239,23 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
                     targetZ = THREE.MathUtils.lerp(l1Pos.z, l2Pos.z, levelProgress);
                     // Scale fades in smoothly between Level 1 and Level 2
                     const l2Frac = Math.max(0, (levelProgress - 0.10) / 0.90);
-                    card.targetScale = l2Frac * (isHov ? 1.25 : 1.0);
+                    card.targetScale = l2Frac * (isHov ? 1.20 : 0.85);
                 } else if (levelProgress <= 2.0) {
                     const frac = THREE.MathUtils.smoothstep(levelProgress, 1.0, 2.0);
                     targetX = THREE.MathUtils.lerp(l2Pos.x, circleX, frac);
                     targetY = THREE.MathUtils.lerp(l2Pos.y, circleY, frac) + bob * (1 - frac);
                     targetZ = THREE.MathUtils.lerp(l2Pos.z, circleZ, frac);
-                    // Extra prominent scale in Level 3 for bigger image cards
-                    card.targetScale = isHov ? 1.40 : 1.15;
+                    // Smoothly scale between Level 2 (0.85) and Level 3 (1.65)
+                    const baseScale = THREE.MathUtils.lerp(0.85, 1.65, frac);
+                    const hovScale = THREE.MathUtils.lerp(1.20, 2.10, frac);
+                    card.targetScale = isHov ? hovScale : baseScale;
                 } else {
                     // Level 4: Scale down and fade away
                     const frac = levelProgress - 2.0;
                     targetX = circleX;
                     targetY = circleY - frac * 5;
                     targetZ = circleZ - frac * 14;
-                    card.targetScale = Math.max(0.0001, (1.0 - frac * 1.6));
+                    card.targetScale = Math.max(0.0001, (1.65 - frac * 2.2));
                 }
 
                 card.mesh.position.set(targetX, targetY, targetZ);
@@ -1951,20 +2264,19 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
 
                 // Card orientation:
                 // Level 1-2: flat relative to heart
-                // Level 3: elegant tangent curve along circle facing viewer (sin(theta) * 0.45)
+                // Level 3: elegant tangent curve along circle facing viewer
                 let baseRotY = 0;
+                const normAngle = Math.atan2(Math.sin(theta), Math.cos(theta));
                 if (levelProgress <= 1.0) {
                     baseRotY = 0;
                 } else if (levelProgress <= 2.0) {
                     const frac = THREE.MathUtils.smoothstep(levelProgress, 1.0, 2.0);
-                    baseRotY = THREE.MathUtils.lerp(0, Math.sin(theta) * 0.45, frac);
+                    baseRotY = THREE.MathUtils.lerp(0, normAngle, frac);
                 } else {
-                    baseRotY = Math.sin(theta) * 0.45;
+                    baseRotY = normAngle;
                 }
 
-                // Smooth flip animation
-                card.flipAngle += (card.targetFlipAngle - card.flipAngle) * Math.min(1, 8.0 * dt);
-                card.mesh.rotation.set(0, baseRotY + card.flipAngle, 0);
+                card.mesh.rotation.set(0, baseRotY, 0);
             }
 
             // 3. Update Halo & Dust opacities
@@ -2008,7 +2320,7 @@ Thank you for being my light, my happiness, and my everything. Mãi yêu em!
 
                 // In Level 3, the card circle gently rotates continuously like a 3D carousel
                 if (levelProgress > 1.5 && levelProgress < 2.5) {
-                    targetGalleryAngle += dt * 0.08;
+                    targetGalleryAngle += dt * (1.24 / CIRCLE_RADIUS);
                 }
             }
 
