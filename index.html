@@ -668,7 +668,7 @@
         <button class="lb-btn lb-prev"  id="lb-prev"  aria-label="Previous">‹</button>
         <button class="lb-btn lb-next"  id="lb-next"  aria-label="Next">›</button>
         <canvas id="lightbox-canvas"></canvas>
-        <video id="lightbox-video" controls playsinline preload="metadata"></video>
+        <video id="lightbox-video" controls playsinline webkit-playsinline preload="auto"></video>
         <div class="lb-caption" id="lb-caption">1 / 4</div>
     </div>
 
@@ -1768,6 +1768,51 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
         const pointerDownPos = { x: 0, y: 0 };
         const rotVelocity = { x: 0, y: 0 };
         let hoveredCard = null;
+        let pointerDownTime = 0;
+        let pointerMaxDist = 0;
+        let pointerType = 'mouse';
+        let potentialTapCard = null;
+
+        function raycastCardAt(x, y) {
+            const rect = canvas.getBoundingClientRect();
+            const w = rect.width || window.innerWidth;
+            const h = rect.height || window.innerHeight;
+            const cx = Math.max(0, Math.min(w, x - rect.left));
+            const cy = Math.max(0, Math.min(h, y - rect.top));
+            const ndc = new THREE.Vector2(
+                (cx / w) * 2 - 1,
+                -(cy / h) * 2 + 1
+            );
+            raycaster.setFromCamera(ndc, camera);
+            const hits = raycaster.intersectObjects(cardMeshes, true);
+            if (!hits || !hits.length) return null;
+            let obj = hits[0].object;
+            while (obj && !obj.userData.cardObj) {
+                obj = obj.parent;
+            }
+            return obj ? obj.userData.cardObj : null;
+        }
+
+        function getCardAtClientPoint(clientX, clientY) {
+            if (levelProgress < 0.35 || levelProgress > 2.65) {
+                return null;
+            }
+            // 1. Direct check at exact coordinate
+            let card = raycastCardAt(clientX, clientY);
+            if (card) return card;
+
+            // 2. Multi-point touch neighborhood check (14px radius) for iOS high-DPI screens
+            const radius = 14;
+            const offsets = [
+                [0, -radius], [0, radius], [-radius, 0], [radius, 0],
+                [-radius, -radius], [radius, -radius], [-radius, radius], [radius, radius]
+            ];
+            for (let i = 0; i < offsets.length; i++) {
+                card = raycastCardAt(clientX + offsets[i][0], clientY + offsets[i][1]);
+                if (card) return card;
+            }
+            return null;
+        }
 
         function isPointerOnCardsCircle(ndc) {
             raycaster.setFromCamera(ndc, camera);
@@ -1785,13 +1830,22 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
             prevPointer.y = e.clientY;
             pointerDownPos.x = e.clientX;
             pointerDownPos.y = e.clientY;
+            pointerDownTime = performance.now();
+            pointerMaxDist = 0;
+            pointerType = e.pointerType || 'mouse';
             rotVelocity.x = 0;
             rotVelocity.y = 0;
+
+            if (e.pointerId !== undefined && canvas.setPointerCapture) {
+                try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+            }
 
             const rect = canvas.getBoundingClientRect();
             pointerNdc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
             pointerNdc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
             pointerActive = true;
+
+            potentialTapCard = getCardAtClientPoint(e.clientX, e.clientY);
 
             // In Level 3: Only move the cards circle horizontal if mouse drag is on the cards circle!
             if (levelProgress > 1.4 && levelProgress < 2.6) {
@@ -1815,7 +1869,11 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
             const dy = e.clientY - prevPointer.y;
 
             const totalDist = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
-            if (totalDist > 6) {
+            pointerMaxDist = Math.max(pointerMaxDist, totalDist);
+
+            // On iOS touch screens, finger wobble can reach 30px. Use 32px for touch, 7px for mouse
+            const dragThreshold = (pointerType === 'touch') ? 32 : 7;
+            if (totalDist > dragThreshold) {
                 dragMoved = true;
             }
 
@@ -1839,30 +1897,103 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
             prevPointer.y = e.clientY;
         });
 
-        window.addEventListener('pointerup', () => {
+        window.addEventListener('pointerup', (e) => {
+            const elapsed = performance.now() - pointerDownTime;
+            const dragThreshold = (pointerType === 'touch') ? 35 : 7;
+            const isTap = !dragMoved && pointerMaxDist < dragThreshold && elapsed < 650;
+
+            if (isTap && levelProgress >= 0.35 && levelProgress <= 2.65) {
+                const target = potentialTapCard ||
+                               getCardAtClientPoint(pointerDownPos.x, pointerDownPos.y) ||
+                               getCardAtClientPoint(e.clientX, e.clientY);
+                if (target && !lb.classList.contains('open')) {
+                    openLightbox(target.photoIndex);
+                }
+            }
+
             if (!isDragging) return;
             isDragging = false;
             canvas.classList.remove('grabbing');
         });
 
-        canvas.addEventListener('pointerleave', () => {
-            pointerActive = false;
-            pointerNdc.set(2, 2);
+        window.addEventListener('pointercancel', (e) => {
+            const elapsed = performance.now() - pointerDownTime;
+            const dragThreshold = (pointerType === 'touch') ? 35 : 7;
+            const isTap = !dragMoved && pointerMaxDist < dragThreshold && elapsed < 650;
+
+            if (isTap && levelProgress >= 0.35 && levelProgress <= 2.65) {
+                const target = potentialTapCard ||
+                               getCardAtClientPoint(pointerDownPos.x, pointerDownPos.y);
+                if (target && !lb.classList.contains('open')) {
+                    openLightbox(target.photoIndex);
+                }
+            }
+
+            isDragging = false;
+            canvas.classList.remove('grabbing');
         });
 
-        canvas.addEventListener('click', () => {
-            // If user clicked (not dragged) on an image card in Level 2 or Level 3
-            if (!dragMoved) {
-                const target = hoveredCard || checkCardHover();
+        canvas.addEventListener('pointerleave', (e) => {
+            if (e.pointerType === 'touch') return;
+            pointerActive = false;
+            pointerNdc.set(2, 2);
+            hoveredCard = null;
+        });
+
+        canvas.addEventListener('click', (e) => {
+            // Desktop mouse click fallback
+            if (!dragMoved && levelProgress >= 0.35 && levelProgress <= 2.65 && !lb.classList.contains('open')) {
+                const target = hoveredCard || getCardAtClientPoint(e.clientX, e.clientY) || potentialTapCard;
                 if (target) {
                     openLightbox(target.photoIndex);
                 }
             }
         });
 
+        // Native touch event fallback for iOS / mobile devices
+        let touchDownPos = { x: 0, y: 0 };
+        let touchDownTime = 0;
+        let touchMaxDist = 0;
+        let touchInitialCard = null;
+
+        canvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                const t = e.touches[0];
+                touchDownPos.x = t.clientX;
+                touchDownPos.y = t.clientY;
+                touchDownTime = performance.now();
+                touchMaxDist = 0;
+                touchInitialCard = getCardAtClientPoint(t.clientX, t.clientY);
+            }
+        }, { passive: true });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 1) {
+                const t = e.touches[0];
+                const d = Math.hypot(t.clientX - touchDownPos.x, t.clientY - touchDownPos.y);
+                touchMaxDist = Math.max(touchMaxDist, d);
+            }
+        }, { passive: true });
+
+        canvas.addEventListener('touchend', (e) => {
+            if (e.changedTouches.length === 1) {
+                const elapsed = performance.now() - touchDownTime;
+                // On iOS Retina screens, touch wobble during a tap easily ranges 25-32px
+                if (touchMaxDist < 35 && elapsed < 650 && levelProgress >= 0.35 && levelProgress <= 2.65) {
+                    const t = e.changedTouches[0];
+                    const target = touchInitialCard ||
+                                   getCardAtClientPoint(touchDownPos.x, touchDownPos.y) ||
+                                   getCardAtClientPoint(t.clientX, t.clientY);
+                    if (target && !lb.classList.contains('open')) {
+                        openLightbox(target.photoIndex);
+                    }
+                }
+            }
+        }, { passive: true });
+
         // Find hovered image card (checks recursive card children)
         function checkCardHover() {
-            if (!pointerActive || levelProgress < 0.4 || levelProgress > 2.6) {
+            if (!pointerActive || levelProgress < 0.35 || levelProgress > 2.65) {
                 return null;
             }
             raycaster.setFromCamera(pointerNdc, camera);
@@ -2085,7 +2216,9 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
                 lbState.image = null;
                 lbVideo.src = fileUrl;
                 lbVideo.currentTime = 0;
-                lbVideo.play().catch(() => {});
+                try { lbVideo.load(); } catch (_) {}
+                const p = lbVideo.play();
+                if (p && p.catch) p.catch(() => {});
             } else {
                 // Image mode: pause & hide video, show canvas
                 if (lbVideo) {
@@ -2116,12 +2249,16 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
             }
         }
 
+        let lbOpenedAt = 0;
         function openLightbox(idx) {
+            lbOpenedAt = Date.now();
             lb.classList.add('open');
             lb.setAttribute('aria-hidden', 'false');
             loadLightboxImage(idx);
         }
         function closeLightbox() {
+            // Prevent iOS Safari 300ms ghost click from immediately closing the lightbox
+            if (Date.now() - lbOpenedAt < 500) return;
             lb.classList.remove('open');
             lb.setAttribute('aria-hidden', 'true');
             if (lbVideo) {
@@ -2133,6 +2270,11 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
         lbCloseBtn.addEventListener('click', closeLightbox);
         lbPrevBtn .addEventListener('click', () => loadLightboxImage(lbState.index - 1));
         lbNextBtn .addEventListener('click', () => loadLightboxImage(lbState.index + 1));
+        lb.addEventListener('click', (e) => {
+            // Prevent iOS Safari 300ms ghost click from immediately closing the lightbox
+            if (Date.now() - lbOpenedAt < 500) return;
+            if (e.target === lb) closeLightbox();
+        });
 
         if (urlParams.get('lightbox') !== null) {
             const pIdx = parseInt(urlParams.get('lightbox'), 10);
@@ -2456,6 +2598,9 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
             handleScrollStep,
             setTheme,
             rotateGallery: (rad) => { targetGalleryAngle = galleryAngle = rad; },
+            openLightbox,
+            closeLightbox,
+            getCardAtClientPoint,
         };
     </script>
 </body>
