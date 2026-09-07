@@ -43,6 +43,7 @@
             height: 100vh;
             display: block;
             cursor: grab;
+            touch-action: none;
         }
         #scene-canvas.grabbing { cursor: grabbing; }
         #scene-canvas.pointer  { cursor: pointer; }
@@ -479,13 +480,147 @@
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
             font-weight: 500;
         }
+
+        /* ===== Mobile Responsiveness (Phones & Small Tablets) ===== */
+        @media (max-width: 768px) {
+            #ui {
+                padding: max(14px, env(safe-area-inset-top, 14px)) 16px max(14px, env(safe-area-inset-bottom, 14px)) 16px;
+                gap: 10px;
+            }
+            .ui-row.top-row {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                grid-template-areas:
+                    "title theme"
+                    "nav nav";
+                gap: 8px 10px;
+                align-items: center;
+                width: 100%;
+            }
+            .title-block {
+                grid-area: title;
+                gap: 2px;
+            }
+            .title {
+                font-size: 16px;
+                letter-spacing: 3px;
+            }
+            .subtitle {
+                font-size: 10px;
+                letter-spacing: 1px;
+            }
+            .ui-controls {
+                display: contents;
+            }
+            .theme-btn {
+                grid-area: theme;
+                padding: 6px 11px;
+                font-size: 10px;
+                justify-self: end;
+                gap: 4px;
+            }
+            .theme-btn #theme-text {
+                display: none;
+            }
+            .level-nav {
+                grid-area: nav;
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                padding: 2px;
+                background: rgba(255, 255, 255, 0.94);
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            }
+            .level-btn {
+                flex: 1;
+                padding: 6px 4px;
+                font-size: 10px;
+                letter-spacing: 0.5px;
+                text-align: center;
+                white-space: nowrap;
+            }
+            .ui-row.bottom-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 6px;
+                text-align: center;
+            }
+            .hint {
+                font-size: 9.5px;
+                letter-spacing: 1px;
+                text-align: center;
+                line-height: 1.4;
+            }
+            .progress {
+                width: 140px;
+                height: 3px;
+            }
+
+            /* Level 4 Letters on phone */
+            #letters-container {
+                padding: 120px 16px 80px 16px;
+            }
+            .letters-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+                max-height: 65vh;
+                padding: 4px;
+            }
+            .letter-card {
+                padding: 18px 16px;
+            }
+            .letter-paper {
+                padding: 34px 18px 24px 18px;
+                max-height: 84vh;
+                border-radius: 16px;
+            }
+            .letter-paper-title {
+                font-size: 18px;
+            }
+            .letter-paper-close {
+                top: 12px;
+                right: 12px;
+                width: 32px;
+                height: 32px;
+                font-size: 15px;
+            }
+
+            /* Lightbox on phone */
+            #lightbox-canvas, #lightbox-video {
+                max-width: 96vw;
+                max-height: 80vh;
+            }
+            .lb-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            .lb-close {
+                top: max(16px, env(safe-area-inset-top, 16px));
+                right: 16px;
+            }
+            .lb-prev { left: 8px; }
+            .lb-next { right: 8px; }
+            .lb-caption {
+                bottom: max(14px, env(safe-area-inset-bottom, 14px));
+                font-size: 11px;
+            }
+            .lb-hint {
+                top: max(16px, env(safe-area-inset-top, 16px));
+                font-size: 9.5px;
+                max-width: 70vw;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
     </style>
 </head>
 <body>
     <canvas id="scene-canvas"></canvas>
 
     <div id="ui">
-        <div class="ui-row">
+        <div class="ui-row top-row">
             <div class="title-block">
                 <div class="title-row">
                     <span class="web-logo">💚</span>
@@ -505,7 +640,7 @@
                 </button>
             </div>
         </div>
-        <div class="ui-row">
+        <div class="ui-row bottom-row">
             <div class="hint" id="level-hint">Drag · Rotate &nbsp;·&nbsp; Scroll · Zoom In to Memories</div>
             <div class="progress"><span id="progress-bar"></span></div>
         </div>
@@ -757,10 +892,20 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
         renderer.setClearColor(0xffffff, 0);
 
         const scene = new THREE.Scene();
+
+        function getAspectMultiplier() {
+            const aspect = window.innerWidth / window.innerHeight;
+            if (aspect < 1.0) {
+                return Math.min(1.85, Math.max(1.0, 0.90 / aspect));
+            }
+            return 1.0;
+        }
+
+        const initAspect = window.innerWidth / window.innerHeight;
         const camera = new THREE.PerspectiveCamera(
-            52, window.innerWidth / window.innerHeight, 0.1, 1500
+            initAspect < 1.0 ? 56 : 52, initAspect, 0.1, 1500
         );
-        camera.position.set(0, 0, 32);
+        camera.position.set(0, 0, 32 * getAspectMultiplier());
 
         // ============================================================
         // PROCEDURAL PARTICLE TEXTURES (Clean Luminance Alpha Masks)
@@ -1707,8 +1852,11 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
 
         canvas.addEventListener('click', () => {
             // If user clicked (not dragged) on an image card in Level 2 or Level 3
-            if (!dragMoved && hoveredCard) {
-                openLightbox(hoveredCard.photoIndex);
+            if (!dragMoved) {
+                const target = hoveredCard || checkCardHover();
+                if (target) {
+                    openLightbox(target.photoIndex);
+                }
             }
         });
 
@@ -1730,26 +1878,22 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
         // Camera parallax & perspective
         const camTarget = new THREE.Vector3(0, 0, 32);
         function updateCamera(dt) {
-            // Base camera position by level:
-            // Level 1 = (0, 0, 32)
-            // Level 2 = (0, 0, 28) (subtle gentle zoom)
-            // Level 3 = (0, 5.8, 29.5) (Elevated perspective tilted down at 3D circle carousel!)
-            // Level 4 = (0, 0, 30)
+            const mob = getAspectMultiplier();
             let targetX = 0;
             let targetY = 0;
-            let targetZ = 32;
+            let targetZ = 32 * mob;
 
             if (levelProgress <= 1.0) {
-                targetZ = THREE.MathUtils.lerp(32, 32, levelProgress);
-                targetY = 0;
+                targetZ = 32 * mob;
+                targetY = mob > 1.05 ? -1.0 : 0;
             } else if (levelProgress <= 2.0) {
                 const frac = THREE.MathUtils.smoothstep(levelProgress, 1.0, 2.0);
-                targetY = THREE.MathUtils.lerp(0, 5.8, frac);
-                targetZ = THREE.MathUtils.lerp(32, 30, frac);
+                targetY = THREE.MathUtils.lerp(mob > 1.05 ? -1.0 : 0, 5.8 * Math.min(1.2, mob), frac);
+                targetZ = THREE.MathUtils.lerp(32 * mob, 30 * mob, frac);
             } else {
                 const frac = THREE.MathUtils.smoothstep(levelProgress, 2.0, 3.0);
-                targetY = THREE.MathUtils.lerp(5.8, 0, frac);
-                targetZ = THREE.MathUtils.lerp(30, 30, frac);
+                targetY = THREE.MathUtils.lerp(5.8 * Math.min(1.2, mob), 0, frac);
+                targetZ = THREE.MathUtils.lerp(30 * mob, 30 * mob, frac);
             }
 
             let parallaxX = 0;
@@ -2051,11 +2195,38 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
         });
 
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
+            const aspect = window.innerWidth / window.innerHeight;
+            camera.aspect = aspect;
+            camera.fov = aspect < 1.0 ? 56 : 52;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
             if (lb.classList.contains('open')) fitImageToCanvas();
         });
+
+        // Touch swipe navigation for Lightbox on mobile phones
+        let lbTouchStartX = 0;
+        let lbTouchStartY = 0;
+        lb.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                lbTouchStartX = e.touches[0].clientX;
+                lbTouchStartY = e.touches[0].clientY;
+            }
+        }, { passive: true });
+
+        lb.addEventListener('touchend', (e) => {
+            if (!lb.classList.contains('open')) return;
+            if (e.changedTouches.length !== 1) return;
+            const dx = e.changedTouches[0].clientX - lbTouchStartX;
+            const dy = e.changedTouches[0].clientY - lbTouchStartY;
+            // Only trigger if horizontal swipe is greater than vertical movement and > 40px
+            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+                if (dx > 0) {
+                    loadLightboxImage(lbState.index - 1); // swipe right = previous
+                } else {
+                    loadLightboxImage(lbState.index + 1); // swipe left = next
+                }
+            }
+        }, { passive: true });
 
         // ============================================================
         // ANIMATION LOOP & MULTI-LEVEL TRANSITIONS
@@ -2155,21 +2326,27 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
                 const circleZ = CIRCLE_CENTER_Z + Math.cos(theta) * CIRCLE_RADIUS;
                 const circleY = Math.sin(elapsedTime * 2.0 + k * 0.45) * 0.09;
 
+                const isMob = window.innerWidth < 768;
+                const l2Base = isMob ? 0.62 : 0.85;
+                const l2Hov  = isMob ? 0.90 : 1.20;
+                const l3Base = isMob ? 1.22 : 1.65;
+                const l3Hov  = isMob ? 1.55 : 2.10;
+
                 if (levelProgress <= 1.0) {
                     targetX = THREE.MathUtils.lerp(l1Pos.x, l2Pos.x, levelProgress);
                     targetY = THREE.MathUtils.lerp(l1Pos.y, l2Pos.y, levelProgress) + bob * levelProgress;
                     targetZ = THREE.MathUtils.lerp(l1Pos.z, l2Pos.z, levelProgress);
                     // Scale fades in smoothly between Level 1 and Level 2
                     const l2Frac = Math.max(0, (levelProgress - 0.10) / 0.90);
-                    card.targetScale = l2Frac * (isHov ? 1.20 : 0.85);
+                    card.targetScale = l2Frac * (isHov ? l2Hov : l2Base);
                 } else if (levelProgress <= 2.0) {
                     const frac = THREE.MathUtils.smoothstep(levelProgress, 1.0, 2.0);
                     targetX = THREE.MathUtils.lerp(l2Pos.x, circleX, frac);
                     targetY = THREE.MathUtils.lerp(l2Pos.y, circleY, frac) + bob * (1 - frac);
                     targetZ = THREE.MathUtils.lerp(l2Pos.z, circleZ, frac);
-                    // Smoothly scale between Level 2 (0.85) and Level 3 (1.65)
-                    const baseScale = THREE.MathUtils.lerp(0.85, 1.65, frac);
-                    const hovScale = THREE.MathUtils.lerp(1.20, 2.10, frac);
+                    // Smoothly scale between Level 2 and Level 3
+                    const baseScale = THREE.MathUtils.lerp(l2Base, l3Base, frac);
+                    const hovScale = THREE.MathUtils.lerp(l2Hov, l3Hov, frac);
                     card.targetScale = isHov ? hovScale : baseScale;
                 } else {
                     // Level 4: Scale down and fade away
@@ -2177,7 +2354,7 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
                     targetX = circleX;
                     targetY = circleY - frac * 5;
                     targetZ = circleZ - frac * 14;
-                    card.targetScale = Math.max(0.0001, (1.65 - frac * 2.2));
+                    card.targetScale = Math.max(0.0001, (l3Base - frac * 2.2));
                 }
 
                 card.mesh.position.set(targetX, targetY, targetZ);
