@@ -1604,8 +1604,9 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
             camera.position.z = 32;
         }
         if (levelProgress >= 0.5 && levelProgress < 2.5) {
+            const isMobInit = window.innerWidth < 768;
             imageCards.forEach(c => {
-                c.currentScale = c.targetScale = (levelProgress > 1.5 ? 1.65 : 0.85);
+                c.currentScale = c.targetScale = (levelProgress > 1.5 ? (isMobInit ? 2.05 : 1.65) : (isMobInit ? 1.10 : 0.85));
                 c.mesh.scale.set(c.currentScale, c.currentScale, 1);
             });
         }
@@ -2020,11 +2021,11 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
             } else if (levelProgress <= 2.0) {
                 const frac = THREE.MathUtils.smoothstep(levelProgress, 1.0, 2.0);
                 targetY = THREE.MathUtils.lerp(mob > 1.05 ? -1.0 : 0, 5.8 * Math.min(1.2, mob), frac);
-                targetZ = THREE.MathUtils.lerp(32 * mob, 30 * mob, frac);
+                targetZ = THREE.MathUtils.lerp(32 * mob, 27 * mob, frac);
             } else {
                 const frac = THREE.MathUtils.smoothstep(levelProgress, 2.0, 3.0);
                 targetY = THREE.MathUtils.lerp(5.8 * Math.min(1.2, mob), 0, frac);
-                targetZ = THREE.MathUtils.lerp(30 * mob, 30 * mob, frac);
+                targetZ = THREE.MathUtils.lerp(27 * mob, 30 * mob, frac);
             }
 
             let parallaxX = 0;
@@ -2469,10 +2470,10 @@ Cầm quên tôi Út Khờ. Tôi là Út Mót 💐😍🥳🥰😘😍☺️🧚
                 const circleY = Math.sin(elapsedTime * 2.0 + k * 0.45) * 0.09;
 
                 const isMob = window.innerWidth < 768;
-                const l2Base = isMob ? 0.62 : 0.85;
-                const l2Hov  = isMob ? 0.90 : 1.20;
-                const l3Base = isMob ? 1.22 : 1.65;
-                const l3Hov  = isMob ? 1.55 : 2.10;
+                const l2Base = isMob ? 1.08 : 0.85;
+                const l2Hov  = isMob ? 1.40 : 1.20;
+                const l3Base = isMob ? 2.05 : 1.65;
+                const l3Hov  = isMob ? 2.50 : 2.10;
 
                 if (levelProgress <= 1.0) {
                     targetX = THREE.MathUtils.lerp(l1Pos.x, l2Pos.x, levelProgress);
